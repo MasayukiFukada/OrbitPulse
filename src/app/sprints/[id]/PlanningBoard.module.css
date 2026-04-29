@@ -1,0 +1,496 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.backLink {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.status {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.planning { background: #e0e0e0; color: #666; }
+.active { background: #e3f2fd; color: #1976d2; }
+.completed { background: #e8f5e9; color: #388e3c; }
+
+.startButton {
+  padding: 0.6rem 1.2rem;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.completeButton {
+  padding: 0.6rem 1.2rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.goalBox {
+  background-color: #fff3f3;
+  border-left: 4px solid #d32f2f;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.dashboard {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  border: 1px solid #eee;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  max-width: 200px;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #444;
+}
+
+.saveButton {
+  padding: 0.4rem 0.8rem;
+  background: #f0f7ff;
+  color: #0070f3;
+  border: 1px solid #0070f3;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.saveButton:hover {
+  background: #0070f3;
+  color: white;
+}
+
+.capacityList {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.capacityRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.dateInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 40px;
+}
+
+.date {
+  font-size: 0.7rem;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.day {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.pulseControl {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f5f5f5;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.pulseBtn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: white;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.pulseValue {
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.noteInput {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #eee;
+  padding: 0.25rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.noteInput:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.itemGroup {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.itemCard {
+  background: #fcfcfc;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.taskList {
+  padding: 0.5rem 1rem 1rem 2rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #f9f9f9;
+  font-size: 0.9rem;
+}
+
+.taskRow.todo { border-left: 3px solid #ccc; }
+.taskRow.doing { border-left: 3px solid #0070f3; background: #f0f7ff; }
+.taskRow.done { border-left: 3px solid #10b981; opacity: 0.7; }
+.taskRow.pooled { border-left: 3px dashed #ffa500; background: #fff8e1; }
+.taskRow.done .taskTitle { text-decoration: line-through; color: #999; }
+
+.statusSelect {
+  font-size: 0.7rem;
+  padding: 0.2rem;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  background: white;
+}
+
+.taskTitleInput {
+  flex: 1;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+}
+
+.taskTitleInput:hover {
+  background: #eee;
+}
+
+.taskTitleInput:focus {
+  outline: none;
+  background: white;
+  border-color: #0070f3;
+}
+
+.taskRow.done .taskTitleInput {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.taskDeadline {
+  margin-right: 0.5rem;
+}
+
+.deadlineInput {
+  border: none;
+  background: #eee;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.addTaskDeadline {
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+  padding: 0.4rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.taskPulseControls {
+  display: flex;
+  gap: 1rem;
+}
+
+.pulseGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pulseLabel {
+  font-size: 0.7rem;
+  color: #999;
+  font-weight: bold;
+}
+
+.addTaskEst {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #f0f0f0;
+  padding: 0 0.5rem;
+  border-radius: 4px;
+}
+
+.estInput {
+  width: 30px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+}
+
+.estInput::-webkit-inner-spin-button,
+.estInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.estUnit {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.taskPulseControl {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.pulseBtnSmall {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.pulseValueSmall {
+  font-size: 0.8rem;
+  font-weight: bold;
+  min-width: 25px;
+  text-align: center;
+}
+
+.taskDeleteBtn {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.taskDeleteBtn:hover {
+  color: #ff1744;
+}
+
+.addTaskRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.addTaskInput {
+  flex: 1;
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.addTaskInput:focus {
+  outline: none;
+  border-color: #0070f3;
+  border-style: solid;
+}
+
+.addTaskBtn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  color: #666;
+  cursor: pointer;
+}
+
+.addTaskBtn:hover {
+  background: #e0e0e0;
+}
+
+.itemMain {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.itemPoints {
+  background: #f0f0f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.itemTitle {
+  font-weight: 500;
+}
+
+.addBtn, .removeBtn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.addBtn {
+  background-color: #f0fff4;
+  color: #2f855a;
+  border-color: #c6f6d5;
+}
+
+.addBtn:hover {
+  background-color: #c6f6d5;
+}
+
+.removeBtn {
+  background-color: #fff5f5;
+  color: #c53030;
+  border-color: #fed7d7;
+}
+
+.removeBtn:hover {
+  background-color: #fed7d7;
+}
+
+.backlogTitle {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
