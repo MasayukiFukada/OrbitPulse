@@ -20,12 +20,12 @@ export default function BacklogForm({ editItem, onCancel }: BacklogFormProps) {
     }
   }, [editItem]);
 
-  const action = editItem 
+  const action = editItem
     ? updateBacklogItemAction.bind(null, editItem.id)
     : addBacklogItemAction;
 
   return (
-    <form 
+    <form
       ref={formRef}
       action={async (formData) => {
         await action(formData);
@@ -33,7 +33,7 @@ export default function BacklogForm({ editItem, onCancel }: BacklogFormProps) {
           formRef.current?.reset();
         }
         if (onCancel) onCancel();
-      }} 
+      }}
       className={styles.form}
     >
       <h2 className={styles.formTitle}>
@@ -42,31 +42,33 @@ export default function BacklogForm({ editItem, onCancel }: BacklogFormProps) {
 
       <div className={styles.inputGroup}>
         <label className={styles.label}>Who(誰が)</label>
-        <input 
-          name="subject" 
-          className={styles.input} 
-          placeholder="私" 
+        <input
+          name="subject"
+          className={styles.input}
+          placeholder="私"
           defaultValue={editItem?.subject || "私"}
         />
       </div>
 
       <div className={styles.inputGroup}>
         <label className={styles.label}>What(何をしたいか)</label>
-        <input 
-          name="title" 
-          required 
-          className={styles.input} 
-          placeholder="何を作る？" 
+        <input
+          name="title"
+          required
+          className={styles.input}
+          placeholder="何を作る？"
           defaultValue={editItem?.title}
         />
       </div>
 
       <div className={styles.inputGroup}>
-        <label className={`${styles.label} ${styles.labelWhy}`}>Why (なぜならば)</label>
-        <textarea 
-          name="why" 
-          required 
-          className={`${styles.textarea} ${styles.textareaWhy}`} 
+        <label className={`${styles.label} ${styles.labelWhy}`}>
+          Why (なぜならば)
+        </label>
+        <textarea
+          name="why"
+          required
+          className={`${styles.textarea} ${styles.textareaWhy}`}
           placeholder="モチベーションの源泉をここに！"
           defaultValue={editItem?.why}
         />
@@ -74,27 +76,32 @@ export default function BacklogForm({ editItem, onCancel }: BacklogFormProps) {
 
       <div className={styles.inputGroup}>
         <label className={styles.label}>Description(詳細説明)</label>
-        <textarea 
-          name="description" 
-          className={styles.textarea} 
-          placeholder="具体的な内容は？" 
+        <textarea
+          name="description"
+          className={styles.textarea}
+          placeholder="具体的な内容は？"
           defaultValue={editItem?.description || ""}
         />
       </div>
 
       <div className={styles.inputGroup}>
-        <label className={styles.label}>Condition(受け入れ条件。これができたら完了)</label>
-        <textarea 
-          name="acceptanceCriteria" 
-          className={styles.textarea} 
-          placeholder="・〇〇ができること&#10;・××が表示されること" 
+        <label className={styles.label}>
+          Condition(受け入れ条件。これができたら完了)
+        </label>
+        <textarea
+          name="acceptanceCriteria"
+          className={styles.textarea}
+          placeholder="・〇〇ができること&#10;・××が表示されること"
           defaultValue={editItem?.acceptanceCriteria || ""}
         />
       </div>
 
       <div className={styles.inputGroup}>
-        <label className={styles.label}>見積もり (パルス数)</label>
-        <FibonacciSelector key={editItem?.id || "new"} defaultValue={editItem?.storyPoints} />
+        <label className={styles.label}>見積もり (ポイント数)</label>
+        <FibonacciSelector
+          key={editItem?.id || "new"}
+          defaultValue={editItem?.storyPoints}
+        />
       </div>
 
       <div className={styles.buttonGroup}>
@@ -102,7 +109,11 @@ export default function BacklogForm({ editItem, onCancel }: BacklogFormProps) {
           {editItem ? "更新する" : "バックログに追加"}
         </button>
         {editItem && (
-          <button type="button" onClick={onCancel} className={styles.cancelButton}>
+          <button
+            type="button"
+            onClick={onCancel}
+            className={styles.cancelButton}
+          >
             キャンセル
           </button>
         )}

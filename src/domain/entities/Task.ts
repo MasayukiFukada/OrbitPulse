@@ -9,7 +9,7 @@ export class Task {
     public estimatedPulse: number = 0,
     public actualPulse: number = 0,
     public readonly createdAt: Date = new Date(),
-    public readonly updatedAt: Date = new Date()
+    public readonly updatedAt: Date = new Date(),
   ) {}
 
   isDone(): boolean {

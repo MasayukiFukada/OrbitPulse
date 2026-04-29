@@ -20,7 +20,7 @@ export class ManageTaskUseCase {
       data.title,
       "todo",
       data.estimatedPulse || 0,
-      0
+      0,
     );
     await this.taskRepository.save(task);
     return task;
@@ -34,7 +34,10 @@ export class ManageTaskUseCase {
     await this.taskRepository.save(task);
   }
 
-  async updateTaskEstimatedPulse(id: string, estimatedPulse: number): Promise<void> {
+  async updateTaskEstimatedPulse(
+    id: string,
+    estimatedPulse: number,
+  ): Promise<void> {
     const task = await this.taskRepository.findById(id);
     if (!task) throw new Error("Task not found");
 

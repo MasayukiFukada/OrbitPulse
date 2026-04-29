@@ -16,7 +16,7 @@ export class ManageSprintUseCase {
     private backlogRepository: BacklogRepository,
     private burnDownSnapshotRepository?: BurnDownSnapshotRepository,
     private taskRepository?: TaskRepository,
-    private todoTaskRepository?: TodoTaskRepository
+    private todoTaskRepository?: TodoTaskRepository,
   ) {}
 
   async getSprints(): Promise<Sprint[]> {
@@ -38,7 +38,7 @@ export class ManageSprintUseCase {
       data.name,
       data.startDate,
       data.endDate,
-      data.goal || null
+      data.goal || null,
     );
 
     await this.sprintRepository.save(sprint);
@@ -47,9 +47,7 @@ export class ManageSprintUseCase {
     const capacities: Capacity[] = [];
     const current = new Date(data.startDate);
     while (current <= data.endDate) {
-      capacities.push(
-        new Capacity(nanoid(), sprint.id, new Date(current), 4)
-      );
+      capacities.push(new Capacity(nanoid(), sprint.id, new Date(current), 4));
       current.setDate(current.getDate() + 1);
     }
 
@@ -57,14 +55,17 @@ export class ManageSprintUseCase {
     return sprint;
   }
 
-  async updateSprint(id: string, data: {
-    name: string;
-    startDate: Date;
-    endDate: Date;
-    goal?: string;
-    status?: SprintStatus;
-    retrospective?: string;
-  }): Promise<void> {
+  async updateSprint(
+    id: string,
+    data: {
+      name: string;
+      startDate: Date;
+      endDate: Date;
+      goal?: string;
+      status?: SprintStatus;
+      retrospective?: string;
+    },
+  ): Promise<void> {
     const sprint = await this.sprintRepository.findById(id);
     if (!sprint) throw new Error("Sprint not found");
 
@@ -73,7 +74,8 @@ export class ManageSprintUseCase {
     sprint.endDate = data.endDate;
     if (data.goal !== undefined) sprint.goal = data.goal;
     if (data.status !== undefined) sprint.status = data.status;
-    if (data.retrospective !== undefined) sprint.retrospective = data.retrospective;
+    if (data.retrospective !== undefined)
+      sprint.retrospective = data.retrospective;
 
     await this.sprintRepository.save(sprint);
   }
@@ -115,7 +117,10 @@ export class ManageSprintUseCase {
     await this.capacityRepository.saveAll(capacities);
   }
 
-  async addBacklogItemToSprint(sprintId: string, backlogItemId: string): Promise<void> {
+  async addBacklogItemToSprint(
+    sprintId: string,
+    backlogItemId: string,
+  ): Promise<void> {
     const item = await this.backlogRepository.findById(backlogItemId);
     if (!item) throw new Error("Backlog item not found");
 
@@ -133,7 +138,7 @@ export class ManageSprintUseCase {
 
   async getItemsInSprint(sprintId: string) {
     const allItems = await this.backlogRepository.findAll();
-    return allItems.filter(item => item.sprintId === sprintId);
+    return allItems.filter((item) => item.sprintId === sprintId);
   }
 
   async calculateRemainingPulse(sprintId: string): Promise<number> {
@@ -166,7 +171,11 @@ export class ManageSprintUseCase {
   }
 
   async takeSnapshot(sprintId: string, date?: Date): Promise<void> {
-    if (!this.burnDownSnapshotRepository || !this.taskRepository || !this.todoTaskRepository) {
+    if (
+      !this.burnDownSnapshotRepository ||
+      !this.taskRepository ||
+      !this.todoTaskRepository
+    ) {
       throw new Error("Required repositories are not set");
     }
 
@@ -174,8 +183,12 @@ export class ManageSprintUseCase {
     targetDate.setHours(0, 0, 0, 0);
 
     // 既にスナップショットがあるか確認（上書きするため取得）
-    const existing = await this.burnDownSnapshotRepository.findBySprintIdAndDate(sprintId, targetDate);
-    
+    const existing =
+      await this.burnDownSnapshotRepository.findBySprintIdAndDate(
+        sprintId,
+        targetDate,
+      );
+
     const remainingPulse = await this.calculateRemainingPulse(sprintId);
 
     if (existing) {
@@ -185,7 +198,7 @@ export class ManageSprintUseCase {
         existing.sprintId,
         existing.date,
         remainingPulse,
-        new Date() // updatedAt は新しい日付を使用
+        new Date(), // updatedAt は新しい日付を使用
       );
       await this.burnDownSnapshotRepository.save(updatedSnapshot);
     } else {
@@ -194,7 +207,7 @@ export class ManageSprintUseCase {
         nanoid(),
         sprintId,
         targetDate,
-        remainingPulse
+        remainingPulse,
       );
       await this.burnDownSnapshotRepository.save(snapshot);
     }
@@ -209,7 +222,11 @@ export class ManageSprintUseCase {
   }
 
   async fillMissingSnapshots(sprintId: string): Promise<void> {
-    if (!this.burnDownSnapshotRepository || !this.taskRepository || !this.todoTaskRepository) {
+    if (
+      !this.burnDownSnapshotRepository ||
+      !this.taskRepository ||
+      !this.todoTaskRepository
+    ) {
       throw new Error("Required repositories are not set");
     }
 
@@ -218,7 +235,7 @@ export class ManageSprintUseCase {
 
     const startDate = new Date(sprint.startDate);
     startDate.setHours(0, 0, 0, 0);
-    
+
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     yesterday.setHours(0, 0, 0, 0);
@@ -226,15 +243,19 @@ export class ManageSprintUseCase {
     const currentDate = new Date(startDate);
 
     while (currentDate <= yesterday) {
-      const existing = await this.burnDownSnapshotRepository.findBySprintIdAndDate(sprintId, currentDate);
+      const existing =
+        await this.burnDownSnapshotRepository.findBySprintIdAndDate(
+          sprintId,
+          currentDate,
+        );
       if (!existing) {
         const remainingPulse = await this.calculateRemainingPulse(sprintId);
-        
+
         const snapshot = new BurnDownSnapshot(
           nanoid(),
           sprintId,
           new Date(currentDate),
-          remainingPulse
+          remainingPulse,
         );
         await this.burnDownSnapshotRepository.save(snapshot);
       }

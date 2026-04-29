@@ -5,8 +5,8 @@ import { SqliteTodoTaskRepository } from "@/infrastructure/repositories/SqliteTo
 import { SqliteCapacityRepository } from "@/infrastructure/repositories/SqliteCapacityRepository";
 import { SqliteBurnDownSnapshotRepository } from "@/infrastructure/repositories/SqliteBurnDownSnapshotRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
-import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import BurnDownChart from "@/app/components/BurnDownChart";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -17,24 +17,32 @@ export default async function DashboardPage() {
   const burnDownSnapshotRepo = new SqliteBurnDownSnapshotRepository();
   const taskRepo = new SqliteTaskRepository();
   const todoTaskRepo = new SqliteTodoTaskRepository();
-  
+
   const sprintUseCase = new ManageSprintUseCase(
-    sprintRepo, 
-    capacityRepo, 
+    sprintRepo,
+    capacityRepo,
     backlogRepoForSprint,
     burnDownSnapshotRepo,
     taskRepo,
-    todoTaskRepo
+    todoTaskRepo,
   );
-  
+
   const sprints = await sprintUseCase.getSprints();
-  const activeSprint = sprints.find(s => s.status === "active");
+  const activeSprint = sprints.find((s) => s.status === "active");
 
   if (!activeSprint) {
     return (
-      <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
-        <h1>ダッシュボード</h1>
-        <p>アクティブなスプリントがありません。スプリントを開始してください。</p>
+      <main
+        style={{
+          padding: "2rem",
+          fontFamily: "sans-serif",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <p>
+          アクティブなスプリントがありません。スプリントを開始してください。
+        </p>
       </main>
     );
   }
@@ -42,15 +50,15 @@ export default async function DashboardPage() {
   // 当日のスナップショットを記録（まだなければ）
   await sprintUseCase.fillMissingSnapshots(activeSprint.id);
   await sprintUseCase.takeSnapshot(activeSprint.id);
-  
+
   // キャパシティとスナップショットを取得
   const capacities = await sprintUseCase.getCapacities(activeSprint.id);
   const snapshots = await sprintUseCase.getSnapshots(activeSprint.id);
 
   // 日付フォーマット関数 (MM/DD)
   const formatDate = (date: Date) => {
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const d = date.getDate().toString().padStart(2, "0");
     return `${m}/${d}`;
   };
 
@@ -59,46 +67,95 @@ export default async function DashboardPage() {
 
   // キャパシティマップ（日付文字列 → パルス数）
   const capacityMap: { [key: string]: number } = {};
-  capacities.forEach(c => {
+  capacities.forEach((c) => {
     const dateStr = formatDate(new Date(c.date));
     capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
   });
 
   // スナップショットマップ（日付文字列 → 残りPulse）
   const snapshotMap: { [key: string]: number } = {};
-  snapshots.forEach(s => {
+  snapshots.forEach((s) => {
     const dateStr = formatDate(new Date(s.date));
     snapshotMap[dateStr] = s.remainingPulse;
   });
 
+  // 総キャパシティを計算
+  let totalCapacity = 0;
+  Object.values(capacityMap).forEach((v) => (totalCapacity += v));
+
   // チャートデータ生成
-  const chartData: any[] = [];
+  type ChartDataItem = {
+    date: string;
+    ideal: number;
+    actual: number | null;
+    capacity: number;
+  };
+  const chartData: ChartDataItem[] = [];
   let idealRemaining = totalPulse;
+  let usedCapacity = 0;
   const currentDate = new Date(activeSprint.startDate);
   const endDate = new Date(activeSprint.endDate);
 
   while (currentDate <= endDate) {
     const dateStr = formatDate(currentDate);
     const dayCapacity = capacityMap[dateStr] || 0;
+    const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
     idealRemaining = Math.max(0, idealRemaining - dayCapacity);
 
-    const actual = snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
+    const actual =
+      snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
 
     chartData.push({
       date: dateStr,
       ideal: idealRemaining,
-      actual: actual
+      actual: actual,
+      capacity: remainingCapacity,
     });
 
+    usedCapacity += dayCapacity;
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1>ダッシュボード</h1>
+    <main
+      style={{
+        padding: "2rem",
+        fontFamily: "var(--font-geist-sans), sans-serif",
+        maxWidth: "1200px",
+        margin: "0 auto",
+      }}
+    >
+      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          <Image
+            src="/images/OrbitPulse_Logo.png"
+            alt="OrbitPulse Logo"
+            width={100}
+            height={100}
+            priority
+          />
+          <span
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: 900,
+              fontFamily: "var(--font-geist-sans), sans-serif",
+              letterSpacing: "0.05em",
+            }}
+          >
+            <span style={{ color: "#113764" }}>Orbit</span>
+            <span style={{ color: "#16ADB4" }}>Pulse</span>
+          </span>
+        </div>
+      </div>
       <h2>現在のスプリント: {activeSprint.name}</h2>
-      <p>総予定Pulse: {totalPulse} P</p>
-      <BurnDownChart chartData={chartData} totalPulse={totalPulse} />
+      <BurnDownChart chartData={chartData} />
     </main>
   );
 }

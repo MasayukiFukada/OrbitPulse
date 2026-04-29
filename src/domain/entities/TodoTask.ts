@@ -11,6 +11,6 @@ export class TodoTask {
     public deadline: Date | null = null,
     public priority: number = 0,
     public readonly createdAt: Date = new Date(),
-    public readonly updatedAt: Date = new Date()
+    public readonly updatedAt: Date = new Date(),
   ) {}
 }

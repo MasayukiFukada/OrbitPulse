@@ -165,8 +165,7 @@ export default function PlanningBoard({
   const totalActualPulse = pbiActual + todoActual;
 
   // バーンダウンチャート用データ生成
-  const generateChartData = () => {
-    const startDate = new Date(sprint.startDate);
+  const startDate = new Date(sprint.startDate);
   const endDate = new Date(sprint.endDate);
   type ChartDataItem = {
     date: string;
@@ -925,4 +924,3 @@ return (
     </div>
   </div>
 );
-}

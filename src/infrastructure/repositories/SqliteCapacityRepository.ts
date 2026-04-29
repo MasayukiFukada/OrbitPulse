@@ -2,6 +2,7 @@ import { CapacityRepository } from "@/domain/repositories/CapacityRepository";
 import { Capacity } from "@/domain/entities/Capacity";
 import { db } from "../db";
 import { capacities } from "../db/schema";
+import type { Capacity as DbCapacity } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteCapacityRepository implements CapacityRepository {
@@ -26,8 +27,7 @@ export class SqliteCapacityRepository implements CapacityRepository {
           .all();
 
         if (existing) {
-          tx
-            .update(capacities)
+          tx.update(capacities)
             .set({
               pulseCount: item.pulseCount,
               note: item.note,
@@ -36,13 +36,15 @@ export class SqliteCapacityRepository implements CapacityRepository {
             .where(eq(capacities.id, item.id))
             .run();
         } else {
-          tx.insert(capacities).values({
-            id: item.id,
-            sprintId: item.sprintId,
-            date: item.date,
-            pulseCount: item.pulseCount,
-            note: item.note,
-          }).run();
+          tx.insert(capacities)
+            .values({
+              id: item.id,
+              sprintId: item.sprintId,
+              date: item.date,
+              pulseCount: item.pulseCount,
+              note: item.note,
+            })
+            .run();
         }
       }
     });
@@ -52,13 +54,13 @@ export class SqliteCapacityRepository implements CapacityRepository {
     await db.delete(capacities).where(eq(capacities.sprintId, sprintId));
   }
 
-  private toEntity(row: any): Capacity {
+  private toEntity(row: DbCapacity): Capacity {
     return new Capacity(
       row.id,
       row.sprintId,
       row.date,
       row.pulseCount,
-      row.note
+      row.note,
     );
   }
 }

@@ -11,7 +11,12 @@ const sprintRepository = new SqliteSprintRepository();
 const capacityRepository = new SqliteCapacityRepository();
 const backlogRepository = new SqliteBacklogRepository();
 const burnDownSnapshotRepository = new SqliteBurnDownSnapshotRepository();
-const useCase = new ManageSprintUseCase(sprintRepository, capacityRepository, backlogRepository, burnDownSnapshotRepository);
+const useCase = new ManageSprintUseCase(
+  sprintRepository,
+  capacityRepository,
+  backlogRepository,
+  burnDownSnapshotRepository,
+);
 
 export async function createSprintAction(formData: FormData) {
   const name = formData.get("name") as string;

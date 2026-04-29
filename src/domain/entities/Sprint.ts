@@ -10,7 +10,7 @@ export class Sprint {
     public status: SprintStatus = "planning",
     public retrospective: string | null = null,
     public readonly createdAt: Date = new Date(),
-    public readonly updatedAt: Date = new Date()
+    public readonly updatedAt: Date = new Date(),
   ) {}
 
   isActive(): boolean {

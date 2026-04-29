@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "@/presentation/styles/layout.module.css";
 
 const geistSans = Geist({
@@ -30,7 +31,17 @@ export default function RootLayout({
         <div className={styles.container}>
           <aside className={styles.sidebar}>
             <Link href="/" className={styles.logo}>
-              OrbitPulse
+              <Image
+                src="/images/OrbitPulse_Logo.png"
+                alt="OrbitPulse Logo"
+                width={40}
+                height={40}
+                priority
+              />
+              <span className={styles.logoText}>
+                <span style={{ color: "#ffffff" }}>Orbit</span>
+                <span style={{ color: "#16ADB4" }}>Pulse</span>
+              </span>
             </Link>
             <nav className={styles.nav}>
               <Link href="/backlog" className={styles.navLink}>
@@ -41,9 +52,7 @@ export default function RootLayout({
               </Link>
             </nav>
           </aside>
-          <main className={styles.main}>
-            {children}
-          </main>
+          <main className={styles.main}>{children}</main>
         </div>
       </body>
     </html>

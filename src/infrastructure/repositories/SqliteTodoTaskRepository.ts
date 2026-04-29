@@ -2,6 +2,7 @@ import { TodoTaskRepository } from "@/domain/repositories/TodoTaskRepository";
 import { TodoTask, TodoTaskStatus } from "@/domain/entities/TodoTask";
 import { db } from "../db";
 import { todoTasks } from "../db/schema";
+import type { TodoTask as DbTodoTask } from "../db/schema";
 import { eq, isNull } from "drizzle-orm";
 
 export class SqliteTodoTaskRepository implements TodoTaskRepository {
@@ -24,7 +25,10 @@ export class SqliteTodoTaskRepository implements TodoTaskRepository {
   }
 
   async findById(id: string): Promise<TodoTask | null> {
-    const [result] = await db.select().from(todoTasks).where(eq(todoTasks.id, id));
+    const [result] = await db
+      .select()
+      .from(todoTasks)
+      .where(eq(todoTasks.id, id));
     return result ? this.toEntity(result) : null;
   }
 
@@ -72,7 +76,7 @@ export class SqliteTodoTaskRepository implements TodoTaskRepository {
       .where(eq(todoTasks.id, id));
   }
 
-  private toEntity(row: any): TodoTask {
+  private toEntity(row: DbTodoTask): TodoTask {
     return new TodoTask(
       row.id,
       row.title,
@@ -83,7 +87,7 @@ export class SqliteTodoTaskRepository implements TodoTaskRepository {
       row.deadline,
       row.priority,
       row.createdAt,
-      row.updatedAt
+      row.updatedAt,
     );
   }
 }

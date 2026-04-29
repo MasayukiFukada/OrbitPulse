@@ -13,7 +13,7 @@ export class BacklogItem {
     public sprintId: string | null = null,
     public priority: number = 0,
     public readonly createdAt: Date = new Date(),
-    public readonly updatedAt: Date = new Date()
+    public readonly updatedAt: Date = new Date(),
   ) {}
 
   // 必要に応じてドメインロジック（ステータス遷移のバリデーションとか）をここに追加する

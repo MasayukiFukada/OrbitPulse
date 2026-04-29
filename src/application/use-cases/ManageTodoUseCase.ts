@@ -26,7 +26,7 @@ export class ManageTodoUseCase {
       "todo",
       data.estimatedPulse || 0,
       0,
-      data.deadline || null
+      data.deadline || null,
     );
     await this.todoTaskRepository.save(todo);
     return todo;
@@ -39,7 +39,10 @@ export class ManageTodoUseCase {
     await this.todoTaskRepository.save(todo);
   }
 
-  async updateTodoEstimatedPulse(id: string, estimatedPulse: number): Promise<void> {
+  async updateTodoEstimatedPulse(
+    id: string,
+    estimatedPulse: number,
+  ): Promise<void> {
     const todo = await this.todoTaskRepository.findById(id);
     if (!todo) throw new Error("TodoTask not found");
     todo.estimatedPulse = estimatedPulse;
@@ -71,7 +74,10 @@ export class ManageTodoUseCase {
     await this.todoTaskRepository.delete(id);
   }
 
-  async assignTodoTaskToSprint(taskId: string, sprintId: string): Promise<void> {
+  async assignTodoTaskToSprint(
+    taskId: string,
+    sprintId: string,
+  ): Promise<void> {
     await this.todoTaskRepository.updateSprintId(taskId, sprintId);
   }
 

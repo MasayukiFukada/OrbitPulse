@@ -25,20 +25,23 @@ export class ManageBacklogUseCase {
       data.description || null,
       data.acceptanceCriteria || null,
       data.storyPoints || 0,
-      "backlog"
+      "backlog",
     );
     await this.backlogRepository.save(newItem);
     return newItem;
   }
 
-  async updateBacklogItem(id: string, data: {
-    subject?: string;
-    title: string;
-    why: string;
-    description?: string;
-    acceptanceCriteria?: string;
-    storyPoints?: number;
-  }): Promise<void> {
+  async updateBacklogItem(
+    id: string,
+    data: {
+      subject?: string;
+      title: string;
+      why: string;
+      description?: string;
+      acceptanceCriteria?: string;
+      storyPoints?: number;
+    },
+  ): Promise<void> {
     const item = await this.backlogRepository.findById(id);
     if (!item) throw new Error("Item not found");
 
@@ -55,7 +58,7 @@ export class ManageBacklogUseCase {
   async updateStatus(id: string, status: BacklogItemStatus): Promise<void> {
     const item = await this.backlogRepository.findById(id);
     if (!item) throw new Error("Item not found");
-    
+
     item.status = status;
     await this.backlogRepository.save(item);
   }

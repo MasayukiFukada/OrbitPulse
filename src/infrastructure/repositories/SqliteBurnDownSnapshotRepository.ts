@@ -2,6 +2,7 @@ import { BurnDownSnapshotRepository } from "@/domain/repositories/BurnDownSnapsh
 import { BurnDownSnapshot } from "@/domain/entities/BurnDownSnapshot";
 import { db } from "../db";
 import { burnDownSnapshots } from "../db/schema";
+import type { BurnDownSnapshot as DbBurnDownSnapshot } from "../db/schema";
 import { eq, and, gte, lte } from "drizzle-orm";
 
 export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotRepository {
@@ -14,7 +15,10 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
     return results.map(this.toEntity);
   }
 
-  async findBySprintIdAndDate(sprintId: string, date: Date): Promise<BurnDownSnapshot | null> {
+  async findBySprintIdAndDate(
+    sprintId: string,
+    date: Date,
+  ): Promise<BurnDownSnapshot | null> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
@@ -27,8 +31,8 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
         and(
           eq(burnDownSnapshots.sprintId, sprintId),
           gte(burnDownSnapshots.date, startOfDay),
-          lte(burnDownSnapshots.date, endOfDay)
-        )
+          lte(burnDownSnapshots.date, endOfDay),
+        ),
       );
     return result ? this.toEntity(result) : null;
   }
@@ -40,7 +44,10 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
   }
 
   async save(snapshot: BurnDownSnapshot): Promise<void> {
-    const existing = await this.findBySprintIdAndDate(snapshot.sprintId, snapshot.date);
+    const existing = await this.findBySprintIdAndDate(
+      snapshot.sprintId,
+      snapshot.date,
+    );
 
     if (existing) {
       await db
@@ -51,8 +58,8 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
         .where(
           and(
             eq(burnDownSnapshots.sprintId, snapshot.sprintId),
-            eq(burnDownSnapshots.date, snapshot.date)
-          )
+            eq(burnDownSnapshots.date, snapshot.date),
+          ),
         );
     } else {
       await db.insert(burnDownSnapshots).values({
@@ -65,13 +72,13 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
     }
   }
 
-  private toEntity(row: any): BurnDownSnapshot {
+  private toEntity(row: DbBurnDownSnapshot): BurnDownSnapshot {
     return new BurnDownSnapshot(
       row.id,
       row.sprintId,
       row.date,
       row.remainingPulse,
-      row.createdAt
+      row.createdAt,
     );
   }
 }

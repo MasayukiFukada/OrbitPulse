@@ -2,7 +2,7 @@ import { SprintRepository } from "@/domain/repositories/SprintRepository";
 import { Sprint, SprintStatus } from "@/domain/entities/Sprint";
 import { db } from "../db";
 import { sprints } from "../db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export class SqliteSprintRepository implements SprintRepository {
   async findAll(): Promise<Sprint[]> {
@@ -59,7 +59,7 @@ export class SqliteSprintRepository implements SprintRepository {
     await db.delete(sprints).where(eq(sprints.id, id));
   }
 
-  private toEntity(row: any): Sprint {
+  private toEntity(row: typeof sprints.$inferSelect): Sprint {
     return new Sprint(
       row.id,
       row.name,
@@ -69,7 +69,7 @@ export class SqliteSprintRepository implements SprintRepository {
       row.status as SprintStatus,
       row.retrospective,
       row.createdAt,
-      row.updatedAt
+      row.updatedAt,
     );
   }
 }

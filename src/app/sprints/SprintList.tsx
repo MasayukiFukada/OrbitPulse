@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { createSprintAction, updateSprintAction, deleteSprintAction } from "./actions";
+import {
+  createSprintAction,
+  updateSprintAction,
+  deleteSprintAction,
+} from "./actions";
 import styles from "./page.module.css";
 import Link from "next/link";
+import type { Sprint } from "@/infrastructure/db/schema";
 
 interface SprintListProps {
-  initialSprints: any[];
+  initialSprints: Sprint[];
 }
 
 export default function SprintList({ initialSprints }: SprintListProps) {
-  const [editingSprint, setEditingSprint] = useState<any | null>(null);
+  const [editingSprint, setEditingSprint] = useState<Sprint | null>(null);
 
   // 日付を input[type="date"] 用の yyyy-mm-dd 形式に変換
   const formatDateForInput = (date: Date) => {
@@ -24,7 +29,9 @@ export default function SprintList({ initialSprints }: SprintListProps) {
       <div className={styles.flexLayout}>
         <section className={styles.sprintList}>
           {initialSprints.length === 0 ? (
-            <p className={styles.empty}>まだスプリントはありません。新しい計画を立てましょう！</p>
+            <p className={styles.empty}>
+              まだスプリントはありません。新しい計画を立てましょう！
+            </p>
           ) : (
             initialSprints.map((sprint) => (
               <div key={sprint.id} className={styles.card}>
@@ -34,9 +41,10 @@ export default function SprintList({ initialSprints }: SprintListProps) {
                     {sprint.status}
                   </span>
                 </div>
-                
+
                 <div className={styles.period}>
-                  {new Date(sprint.startDate).toLocaleDateString()} 〜 {new Date(sprint.endDate).toLocaleDateString()}
+                  {new Date(sprint.startDate).toLocaleDateString()} 〜{" "}
+                  {new Date(sprint.endDate).toLocaleDateString()}
                 </div>
 
                 {sprint.goal && (
@@ -46,25 +54,32 @@ export default function SprintList({ initialSprints }: SprintListProps) {
                 )}
 
                 <div className={styles.cardActions}>
-                  <Link href={`/sprints/${sprint.id}`} className={styles.detailLink}>
+                  <Link
+                    href={`/sprints/${sprint.id}`}
+                    className={styles.detailLink}
+                  >
                     プランニング
                   </Link>
                   <div className={styles.cardSecondaryActions}>
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingSprint(sprint);
                         window.scrollTo({ top: 0, behavior: "smooth" });
-                      }} 
+                      }}
                       className={styles.editButton}
                     >
                       編集
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
-                        if (confirm("スプリントを削除してもええか？（紐付いてるキャパシティも消えるで）")) {
+                        if (
+                          confirm(
+                            "スプリントを削除してもええか？（紐付いてるキャパシティも消えるで）",
+                          )
+                        ) {
                           deleteSprintAction(sprint.id);
                         }
-                      }} 
+                      }}
                       className={styles.deleteButton}
                     >
                       削除
@@ -77,7 +92,7 @@ export default function SprintList({ initialSprints }: SprintListProps) {
         </section>
 
         <section className={styles.formSection}>
-          <form 
+          <form
             action={async (formData) => {
               if (editingSprint) {
                 await updateSprintAction(editingSprint.id, formData);
@@ -85,20 +100,22 @@ export default function SprintList({ initialSprints }: SprintListProps) {
               } else {
                 await createSprintAction(formData);
               }
-            }} 
+            }}
             className={styles.form}
           >
             <h2 className={styles.formTitle}>
-              {editingSprint ? "スプリントを編集" : "新しいスプリントを計画する"}
+              {editingSprint
+                ? "スプリントを編集"
+                : "新しいスプリントを計画する"}
             </h2>
-            
+
             <div className={styles.inputGroup}>
               <label className={styles.label}>スプリント名</label>
-              <input 
-                name="name" 
-                required 
-                className={styles.input} 
-                placeholder="例: 第1回 軌道投入" 
+              <input
+                name="name"
+                required
+                className={styles.input}
+                placeholder="例: 第1回 軌道投入"
                 defaultValue={editingSprint?.name || ""}
               />
             </div>
@@ -106,32 +123,40 @@ export default function SprintList({ initialSprints }: SprintListProps) {
             <div className={styles.row}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>開始日</label>
-                <input 
-                  name="startDate" 
-                  type="date" 
-                  required 
-                  className={styles.input} 
-                  defaultValue={editingSprint ? formatDateForInput(editingSprint.startDate) : ""}
+                <input
+                  name="startDate"
+                  type="date"
+                  required
+                  className={styles.input}
+                  defaultValue={
+                    editingSprint
+                      ? formatDateForInput(editingSprint.startDate)
+                      : ""
+                  }
                 />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>終了日</label>
-                <input 
-                  name="endDate" 
-                  type="date" 
-                  required 
-                  className={styles.input} 
-                  defaultValue={editingSprint ? formatDateForInput(editingSprint.endDate) : ""}
+                <input
+                  name="endDate"
+                  type="date"
+                  required
+                  className={styles.input}
+                  defaultValue={
+                    editingSprint
+                      ? formatDateForInput(editingSprint.endDate)
+                      : ""
+                  }
                 />
               </div>
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>スプリントゴール (Why)</label>
-              <textarea 
-                name="goal" 
-                className={styles.textarea} 
-                placeholder="このスプリントで何を成し遂げたい？" 
+              <textarea
+                name="goal"
+                className={styles.textarea}
+                placeholder="このスプリントで何を成し遂げたい？"
                 defaultValue={editingSprint?.goal || ""}
               />
             </div>
@@ -141,9 +166,9 @@ export default function SprintList({ initialSprints }: SprintListProps) {
                 {editingSprint ? "更新する" : "スプリント作成"}
               </button>
               {editingSprint && (
-                <button 
-                  type="button" 
-                  onClick={() => setEditingSprint(null)} 
+                <button
+                  type="button"
+                  onClick={() => setEditingSprint(null)}
                   className={styles.cancelButton}
                 >
                   キャンセル

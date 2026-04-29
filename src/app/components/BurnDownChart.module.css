@@ -1,17 +1,17 @@
 .container {
-  width: 100%;
-  height: 400px;
-  margin-top: 2rem;
-  margin-bottom: 3rem;
-  padding-bottom: 1rem;
-  position: relative;
+    width: 100%;
+    height: 400px;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+    position: relative;
 }
 
 .chartWrapper {
-  width: 100%;
-  height: calc(100% - 3rem); /* タイトルとパラグラフの分を引く */
+    width: 100%;
+    height: calc(100% - 3rem); /* タイトルとパラグラフの分を引く */
 }
 
 .rechartsSurface {
-  overflow: visible !important;
+    overflow: visible !important;
 }

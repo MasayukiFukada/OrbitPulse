@@ -1,6 +1,7 @@
 import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
 import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import BacklogList from "./BacklogList";
+import type { BacklogItem as DbBacklogItem } from "@/infrastructure/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export default async function BacklogPage() {
   const items = await useCase.getBacklogItems();
 
   // シリアライズ可能な形式に変換（エンティティクラスからプレーンオブジェクトへ）
-  const plainItems = items.map(item => ({
+  const plainItems = items.map((item) => ({
     id: item.id,
     subject: item.subject,
     title: item.title,
@@ -24,5 +25,7 @@ export default async function BacklogPage() {
     updatedAt: item.updatedAt,
   }));
 
-  return <BacklogList initialItems={plainItems as any} />;
+  return (
+    <BacklogList initialItems={plainItems as unknown as DbBacklogItem[]} />
+  );
 }

@@ -2,6 +2,7 @@ import { TaskRepository } from "@/domain/repositories/TaskRepository";
 import { Task, TaskStatus } from "@/domain/entities/Task";
 import { db } from "../db";
 import { tasks } from "../db/schema";
+import type { Task as DbTask } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteTaskRepository implements TaskRepository {
@@ -51,7 +52,7 @@ export class SqliteTaskRepository implements TaskRepository {
     await db.delete(tasks).where(eq(tasks.id, id));
   }
 
-  private toEntity(row: any): Task {
+  private toEntity(row: DbTask): Task {
     return new Task(
       row.id,
       row.backlogItemId,
@@ -60,7 +61,7 @@ export class SqliteTaskRepository implements TaskRepository {
       row.estimatedPulse,
       row.actualPulse,
       row.createdAt,
-      row.updatedAt
+      row.updatedAt,
     );
   }
 }
