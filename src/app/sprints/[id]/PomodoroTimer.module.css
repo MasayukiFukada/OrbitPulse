@@ -1,0 +1,126 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.timerCard {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 300px;
+}
+
+.statusText {
+  margin-top: 0;
+  color: #333;
+}
+
+.taskTitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeDisplay {
+  font-size: 4rem;
+  font-weight: bold;
+  font-family: monospace;
+  margin-bottom: 2rem;
+  color: #e74c3c;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.startBtn, .pauseBtn, .cancelBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.startBtn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.pauseBtn {
+  background-color: #f39c12;
+  color: white;
+}
+
+.cancelBtn {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.startBtn:hover, .pauseBtn:hover, .cancelBtn:hover {
+  opacity: 0.8;
+}
+
+.pomodoroBtn {
+  background: none;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s;
+}
+
+.pomodoroBtn:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.statusBanner {
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.statusLabel {
+  opacity: 0.9;
+}
+
+.statusTask {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusTime {
+  font-family: monospace;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}

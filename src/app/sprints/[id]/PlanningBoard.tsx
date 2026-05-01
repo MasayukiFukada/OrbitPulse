@@ -23,8 +23,12 @@ import {
   unassignTodoTaskFromSprintAction,
 } from "./actions";
 import styles from "./PlanningBoard.module.css";
+import pomodoroStyles from "./PomodoroTimer.module.css";
 import Link from "next/link";
 import BurnDownChart from "@/app/components/BurnDownChart";
+import PomodoroTimer from "./PomodoroTimer";
+import { PomodoroProvider, usePomodoro } from "./PomodoroContext";
+import PomodoroStatusDisplay from "./PomodoroStatusDisplay";
 import type {
   Sprint,
   Capacity,
@@ -64,6 +68,31 @@ export default function PlanningBoard({
   todoTasks,
   unassignedTodoTasks,
 }: PlanningBoardProps) {
+  return (
+    <PomodoroProvider>
+      <PlanningBoardInner
+        sprint={sprint}
+        initialCapacities={initialCapacities}
+        snapshots={snapshots}
+        sprintItems={sprintItems}
+        availableItems={availableItems}
+        todoTasks={todoTasks}
+        unassignedTodoTasks={unassignedTodoTasks}
+      />
+    </PomodoroProvider>
+  );
+}
+
+function PlanningBoardInner({
+  sprint,
+  initialCapacities,
+  snapshots,
+  sprintItems,
+  availableItems,
+  todoTasks,
+  unassignedTodoTasks,
+}: PlanningBoardProps) {
+  const { startPomodoro } = usePomodoro();
   const [capacities, setCapacities] = useState(initialCapacities);
   const [isSaving, setIsSaving] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState<{ [key: string]: string }>(
@@ -77,6 +106,39 @@ export default function PlanningBoard({
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
     new Set(["todo", "doing", "done", "pooled"]),
   );
+
+  const handleStartPomodoro = async (taskId: string, isTodoTask: boolean) => {
+    const task = isTodoTask
+      ? todoTasks.find((t) => t.id === taskId)
+      : sprintItems
+          .flatMap((item) => item.tasks)
+          .find((t) => t.id === taskId);
+
+    if (!task) return;
+
+    // 実績+1
+    if (isTodoTask) {
+      await updateTodoPulseAction(sprint.id, taskId, task.actualPulse + 1);
+      if (task.status === "todo") {
+        await updateTodoStatusAction(sprint.id, taskId, "doing");
+      }
+    } else {
+      await updateTaskPulseAction(sprint.id, taskId, task.actualPulse + 1);
+      if (task.status === "todo") {
+        await updateTaskStatusAction(sprint.id, taskId, "doing");
+      }
+    }
+
+    // Contextを開始
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+    startPomodoro(taskId, task.title, isTodoTask, 25);
+  };
+
+  const handleCompletePomodoro = async (taskId: string, isTodoTask: boolean) => {
+    // 完了時の追加アクションがあればここに記述
+  };
 
   const toggleStatus = (status: string) => {
     setSelectedStatuses((prev) => {
@@ -282,8 +344,8 @@ const handleAddTodoTask = async () => {
 };
 
 return (
-  <div className={styles.container}>
-    <header className={styles.header}>
+    <div className={styles.container}>
+      <header className={styles.header}>
       <div className={styles.headerLeft}>
         <Link href="/sprints" className={styles.backLink}>
           ← Sprints
@@ -497,6 +559,17 @@ return (
                             <option value="done">DONE</option>
                           </select>
                         </div>
+                        {(task.status === "todo" || task.status === "doing") && (
+                          <button
+                            onClick={() =>
+                              handleStartPomodoro(task.id, false)
+                            }
+                            className={pomodoroStyles.pomodoroBtn}
+                            title="ポモドーロタイマーを開始"
+                          >
+                            🍅
+                          </button>
+                        )}
                         <input
                           type="text"
                           defaultValue={task.title}
@@ -721,11 +794,21 @@ return (
                         <option value="doing">DOING</option>
                         <option value="pooled">POOLED</option>
                         <option value="done">DONE</option>
-                      </select>
-                    </div>
-                    <input
-                      type="text"
-                      defaultValue={todo.title}
+                        </select>
+                        </div>
+                        {(todo.status === "todo" || todo.status === "doing") && (
+                        <button
+                        onClick={() =>
+                          handleStartPomodoro(todo.id, true)
+                        }
+                        className={pomodoroStyles.pomodoroBtn}
+                        title="ポモドーロタイマーを開始"
+                        >
+                        🍅
+                        </button>
+                        )}
+                        <input
+                        type="text"                      defaultValue={todo.title}
                       className={`${styles.taskTitleInput} ${todo.estimatedPulse === 0 || (todo.status === "done" && todo.actualPulse === 0) ? styles.taskTitleWarning : ""}`}
                       onBlur={(e) => {
                         if (e.target.value !== todo.title) {
@@ -923,6 +1006,10 @@ return (
         </div>
       </section>
     </div>
+    <PomodoroTimer
+      onStart={handleStartPomodoro}
+      onComplete={handleCompletePomodoro}
+    />
   </div>
 );
 }

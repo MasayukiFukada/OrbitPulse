@@ -7,6 +7,8 @@ import { SqliteBurnDownSnapshotRepository } from "@/infrastructure/repositories/
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
 import BurnDownChart from "@/app/components/BurnDownChart";
 import Image from "next/image";
+import { PomodoroProvider } from "./sprints/[id]/PomodoroContext";
+import PomodoroStatusDisplay from "./sprints/[id]/PomodoroStatusDisplay";
 
 export const dynamic = "force-dynamic";
 
@@ -32,18 +34,21 @@ export default async function DashboardPage() {
 
   if (!activeSprint) {
     return (
-      <main
-        style={{
-          padding: "2rem",
-          fontFamily: "sans-serif",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <p>
-          アクティブなスプリントがありません。スプリントを開始してください。
-        </p>
-      </main>
+      <PomodoroProvider>
+        <main
+          style={{
+            padding: "2rem",
+            fontFamily: "sans-serif",
+            maxWidth: "1200px",
+            margin: "0 auto",
+          }}
+        >
+          <PomodoroStatusDisplay />
+          <p>
+            アクティブなスプリントがありません。スプリントを開始してください。
+          </p>
+        </main>
+      </PomodoroProvider>
     );
   }
 
@@ -117,45 +122,48 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main
-      style={{
-        padding: "2rem",
-        fontFamily: "var(--font-geist-sans), sans-serif",
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <div
-          style={{
-            display: "inline-flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "1rem",
-          }}
-        >
-          <Image
-            src="/images/OrbitPulse_Logo.png"
-            alt="OrbitPulse Logo"
-            width={100}
-            height={100}
-            priority
-          />
-          <span
+    <PomodoroProvider>
+      <main
+        style={{
+          padding: "2rem",
+          fontFamily: "var(--font-geist-sans), sans-serif",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <PomodoroStatusDisplay />
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div
             style={{
-              fontSize: "2.5rem",
-              fontWeight: 900,
-              fontFamily: "var(--font-geist-sans), sans-serif",
-              letterSpacing: "0.05em",
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
             }}
           >
-            <span style={{ color: "#113764" }}>Orbit</span>
-            <span style={{ color: "#16ADB4" }}>Pulse</span>
-          </span>
+            <Image
+              src="/images/OrbitPulse_Logo.png"
+              alt="OrbitPulse Logo"
+              width={100}
+              height={100}
+              priority
+            />
+            <span
+              style={{
+                fontSize: "2.5rem",
+                fontWeight: 900,
+                fontFamily: "var(--font-geist-sans), sans-serif",
+                letterSpacing: "0.05em",
+              }}
+            >
+              <span style={{ color: "#113764" }}>Orbit</span>
+              <span style={{ color: "#16ADB4" }}>Pulse</span>
+            </span>
+          </div>
         </div>
-      </div>
-      <h2>現在のスプリント: {activeSprint.name}</h2>
-      <BurnDownChart chartData={chartData} />
-    </main>
+        <h2>現在のスプリント: {activeSprint.name}</h2>
+        <BurnDownChart chartData={chartData} />
+      </main>
+    </PomodoroProvider>
   );
 }
