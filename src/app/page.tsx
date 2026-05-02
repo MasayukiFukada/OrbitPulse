@@ -96,23 +96,47 @@ export default async function DashboardPage() {
     capacity: number;
   };
   const chartData: ChartDataItem[] = [];
-  let idealRemaining = totalPulse;
   let usedCapacity = 0;
   const currentDate = new Date(activeSprint.startDate);
-  const endDate = new Date(activeSprint.endDate);
+  const endDate = new Date(activeSprint.endDate);  
+  
+  // 現在の残り作業量を取得
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = formatDate(today);
+  let idealStarted = false;
+  let remainingWork = totalPulse;
 
   while (currentDate <= endDate) {
     const dateStr = formatDate(currentDate);
     const dayCapacity = capacityMap[dateStr] || 0;
     const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
-    idealRemaining = Math.max(0, idealRemaining - dayCapacity);
+
+    // 理想線：今日から開始し、明日以降のキャパシティ通りに消化した場合を計算
+    let idealValue = null;
+    if (!idealStarted && dateStr >= todayStr) {
+      idealStarted = true;
+      // 現在の残り作業量を設定（最新のスナップショットがあればそれを使う）
+      const latestSnapshot = [...snapshots].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0];
+      remainingWork = latestSnapshot ? latestSnapshot.remainingPulse : totalPulse;
+      idealValue = remainingWork; // 今日の時点での残り作業量を表示
+    }
+    
+    if (idealStarted && dateStr > todayStr) {
+      // 明日以降：実際のキャパシティ通りに減算（整数）
+      const dailyDecrease = Math.min(dayCapacity, remainingWork);
+      remainingWork = Math.max(0, remainingWork - dailyDecrease);
+      idealValue = remainingWork;
+    }
 
     const actual =
       snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
 
     chartData.push({
       date: dateStr,
-      ideal: idealRemaining,
+      ideal: idealValue,
       actual: actual,
       capacity: remainingCapacity,
     });

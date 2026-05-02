@@ -91,7 +91,7 @@
     flex-direction: column;
     gap: 0.25rem;
     flex: 1;
-    max-width: 200px;
+    min-width: 0;
 }
 
 .statLabel {

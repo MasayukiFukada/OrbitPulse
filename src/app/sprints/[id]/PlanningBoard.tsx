@@ -226,18 +226,6 @@ function PlanningBoardInner({
   );
   const totalActualPulse = pbiActual + todoActual;
 
-  // バーンダウンチャート用データ生成
-  const generateChartData = () => {
-    const startDate = new Date(sprint.startDate);
-  const endDate = new Date(sprint.endDate);
-  type ChartDataItem = {
-    date: string;
-    ideal: number;
-    actual: number | null;
-    capacity: number;
-  };
-  const chartData: ChartDataItem[] = [];
-
   // 日付フォーマット関数 (MM/DD)
   const formatDate = (date: Date) => {
     const m = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -245,66 +233,127 @@ function PlanningBoardInner({
     return `${m}/${d}`;
   };
 
-  // 理想線のためのキャパシティ累積計算
+  // キャパシティマップ（日付文字列 → パルス数）
   const capacityMap: { [key: string]: number } = {};
   capacities.forEach((c: Capacity) => {
     const dateStr = formatDate(new Date(c.date));
     capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
   });
-
-  // 総予定Pulse: スナップショットの最初の値に予定実績を足すか、現在の総予定Pulse
-  let totalPulse;
-  if (snapshots && snapshots.length > 0) {
-    const sortedSnapshots = [...snapshots].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-    );
-    // スナップショットの最初の残りPulse + その時点の予定実績（完了分）
-    totalPulse = sortedSnapshots[0].remainingPulse + plannedActualPulse;
-  } else {
-    totalPulse = totalEstPulse;
-  }
-
-  // 総キャパシティを計算
-  let totalCapacity = 0;
-  Object.values(capacityMap).forEach((v) => (totalCapacity += v));
-
-  // 日ごとの理想残りPulseと実績残りPulse
-  let idealRemaining = totalPulse;
-  let usedCapacity = 0;
-  const currentDate = new Date(startDate);
-  const snapshotMap: { [key: string]: number } = {};
-  (snapshots || []).forEach((s: BurnDownSnapshot) => {
-    const dateStr = formatDate(new Date(s.date));
-    snapshotMap[dateStr] = s.remainingPulse;
-  });
-
+  
+  // 残り見積Pulse（未完了タスクの見積もり合計）
+  const remainingEstPulse = totalEstPulse - plannedActualPulse;
+  
+  // 明日以降のキャパシティ合計（本日を除く）
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const endDate = new Date(sprint.endDate);
+  endDate.setHours(0, 0, 0, 0);
+  let remainingCapacityFromTomorrow = 0;
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const currentDate = new Date(tomorrow);
   while (currentDate <= endDate) {
     const dateStr = formatDate(currentDate);
-    const dayCapacity = capacityMap[dateStr] || 0;
-    const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
-    idealRemaining = Math.max(0, idealRemaining - dayCapacity);
-
-    const actual =
-      snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
-
-    chartData.push({
-      date: dateStr,
-      ideal: idealRemaining,
-      actual: actual,
-      capacity: remainingCapacity,
-    });
-
-    usedCapacity += dayCapacity;
+    remainingCapacityFromTomorrow += capacityMap[dateStr] || 0;
     currentDate.setDate(currentDate.getDate() + 1);
   }
+  
+  // 警告判定：残り見積が明日以降のキャパシティを超えているか
+  const isOverCapacity = remainingEstPulse > remainingCapacityFromTomorrow;
 
-  return { chartData, totalPulse };
-}
+  // バーンダウンチャート用データ生成
+  const generateChartData = () => {
+    const chartStartDate = new Date(sprint.startDate);
+    const chartEndDate = new Date(sprint.endDate);
+    type ChartDataItem = {
+      date: string;
+      ideal: number;
+      actual: number | null;
+      capacity: number;
+    };
+    const chartData: ChartDataItem[] = [];
+  
+    // 総予定Pulse: スナップショットの最初の値に予定実績を足すか、現在の総予定Pulse
+    let totalPulse;
+    if (snapshots && snapshots.length > 0) {
+      const sortedSnapshots = [...snapshots].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
+      // スナップショットの最初の残りPulse + その時点の予定実績（完了分）
+      totalPulse = sortedSnapshots[0].remainingPulse + plannedActualPulse;
+    } else {
+      totalPulse = totalEstPulse;
+    }
+
+    // 総キャパシティを計算
+    let totalCapacity = 0;
+    Object.values(capacityMap).forEach((v) => (totalCapacity += v));
+
+    // 日ごとの理想残りPulseと実績残りPulse
+    let usedCapacity = 0;
+    const currentDate = new Date(chartStartDate);
+    const snapshotMap: { [key: string]: number } = {};
+    (snapshots || []).forEach((s: BurnDownSnapshot) => {
+      const dateStr = formatDate(new Date(s.date));
+      snapshotMap[dateStr] = s.remainingPulse;
+    });
+
+    // 現在の残り作業量を取得（最新のスナップショットまたは総予定）
+    const todayInChart = new Date();
+    todayInChart.setHours(0, 0, 0, 0);
+    const todayStr = formatDate(todayInChart);  
+    // 現在日から理想線を開始するための準備
+    let idealStarted = false;
+    let remainingWork = totalPulse; // 現在の残り作業量
+  
+  // 残り工作日数の計算は不要（実際のキャパシティ通りに消化するため）
+
+    while (currentDate <= chartEndDate) {
+      const dateStr = formatDate(currentDate);
+      const dayCapacity = capacityMap[dateStr] || 0;
+      const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
+
+    // 理想線：今日から開始し、明日以降のキャパシティ通りに消化した場合を計算
+    let idealValue = null;
+    if (!idealStarted && dateStr >= todayStr) {
+      // 今日以降：理想線を開始
+      idealStarted = true;
+      // 現在の残り作業量を設定（最新のスナップショットがあればそれを使う）
+      const latestSnapshot = [...(snapshots || [])].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0];
+      remainingWork = latestSnapshot ? latestSnapshot.remainingPulse : totalPulse;
+      idealValue = remainingWork; // 今日の時点での残り作業量を表示
+    }
+    
+    if (idealStarted && dateStr > todayStr) {
+      // 明日以降：実際のキャパシティ通りに減算（整数）
+      const dailyDecrease = Math.min(dayCapacity, remainingWork);
+      remainingWork = Math.max(0, remainingWork - dailyDecrease);
+      idealValue = remainingWork;
+    }
+
+      const actual =
+        snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
+
+      chartData.push({
+        date: dateStr,
+        ideal: idealValue,
+        actual: actual,
+        capacity: remainingCapacity,
+      });
+
+      usedCapacity += dayCapacity;
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return { chartData, totalPulse };
+  };
 
 const { chartData, totalPulse } = generateChartData();
 
-const today = new Date();
-const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+const todayForStr = new Date();
+const todayStr = `${todayForStr.getFullYear()}-${String(todayForStr.getMonth() + 1).padStart(2, "0")}-${String(todayForStr.getDate()).padStart(2, "0")}`;
 
 const formatDateForInput = (date: string | Date | null) => {
   if (!date) return "";
@@ -383,18 +432,23 @@ return (
 
     <div className={styles.dashboard}>
       <div className={styles.statCard}>
-        <span className={styles.statLabel}>総キャパシティ</span>
-        <span className={styles.statValue}>{totalCapacity} P</span>
-      </div>
-      <div className={styles.statCard}>
-        <span className={styles.statLabel}>総予定 / 予定実績 / 実際実績</span>
+        <span className={styles.statLabel}>総予定 / 完了分当初見積 / 実際実績</span>
         <span className={styles.statValue}>
-          {totalEstPulse} / {plannedActualPulse} / {totalActualPulse} P
+          {totalEstPulse} / {plannedActualPulse} / {totalActualPulse} Pulse
         </span>
       </div>
       <div className={styles.statCard}>
-        <span className={styles.statLabel}>合計見積もり</span>
-        <span className={styles.statValue}>{totalPoints} pts</span>
+        <span className={styles.statLabel}>残り見積</span>
+        <span className={styles.statValue} style={isOverCapacity ? { color: '#e74c3c', fontWeight: 'bold' } : {}}>
+          {remainingEstPulse} Pulse
+        </span>
+        {isOverCapacity && <span style={{ color: '#e74c3c', fontSize: '0.8rem', marginTop: '0.25rem' }}>⚠️ キャパシティ超過</span>}
+      </div>
+      <div className={styles.statCard}>
+        <span className={styles.statLabel}>明日以降のキャパシティ</span>
+        <span className={styles.statValue} style={isOverCapacity ? { color: '#e74c3c', fontWeight: 'bold' } : {}}>
+          {remainingCapacityFromTomorrow} Pulse
+        </span>
       </div>
     </div>
 

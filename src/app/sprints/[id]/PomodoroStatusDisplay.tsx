@@ -5,8 +5,10 @@ import styles from "./PomodoroTimer.module.css";
 
 export default function PomodoroStatusDisplay() {
   const { state, timeLeft } = usePomodoro();
+  const isBreak = state.status === "break";
+  const isBreakEnded = timeLeft === 0 && state.status === "break";
 
-  if (state.status === "idle") return null;
+  if (state.status === "idle" || isBreakEnded) return null;
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -15,9 +17,9 @@ export default function PomodoroStatusDisplay() {
   };
 
   return (
-    <div className={styles.statusBanner}>
+    <div className={`${styles.statusBanner} ${isBreak ? styles.breakBanner : ""}`}>
       <span className={styles.statusLabel}>
-        {state.status === "work" ? "🔥 作業中" : "☕ 休憩中"}:
+        {isBreak ? "☕ 休憩中" : "🔥 作業中"}:
       </span>
       <span className={styles.statusTask}>{state.taskTitle}</span>
       <span className={styles.statusTime}>{formatTime(timeLeft)}</span>

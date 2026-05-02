@@ -60,16 +60,19 @@ export default function PomodoroTimer({
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  if (state.status === "idle") return null;
+   const isBreak = state.status === "break";
+   const isBreakEnded = timeLeft === 0 && state.status === "break";
+
+  if (state.status === "idle" || isBreakEnded) return null;
 
   return (
     <div className={styles.overlay}>
       <div className={styles.timerCard}>
-        <h3 className={styles.statusText}>
-          {state.status === "break" ? "☕ 休憩中" : "🔥 作業中"}
+        <h3 className={`${styles.statusText} ${isBreak ? styles.breakText : ""}`}>
+          {isBreak ? "☕ 休憩中" : "🔥 作業中"}
         </h3>
-        <div className={styles.taskTitle}>{state.taskTitle}</div>
-        <div className={styles.timeDisplay}>{formatTime(timeLeft)}</div>
+        <div className={`${styles.taskTitle} ${isBreak ? styles.breakText : ""}`}>{state.taskTitle}</div>
+        <div className={`${styles.timeDisplay} ${isBreak ? styles.breakText : ""}`}>{formatTime(timeLeft)}</div>
         <div className={styles.controls}>
           <button onClick={cancelTimer} className={styles.cancelBtn}>
             中止
