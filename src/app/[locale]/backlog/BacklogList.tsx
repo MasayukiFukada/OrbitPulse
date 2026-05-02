@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { BacklogItem } from "@/domain/entities/BacklogItem";
 import BacklogForm from "./BacklogForm";
 import { deleteBacklogItemAction } from "./actions";
@@ -12,41 +13,43 @@ interface BacklogListProps {
 
 export default function BacklogList({ initialItems }: BacklogListProps) {
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const t = useTranslations("backlog");
+  const tc = useTranslations("common");
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>OrbitPulse Backlog</h1>
+      <h1 className={styles.title}>OrbitPulse {t("title")}</h1>
 
       <div className={styles.flexLayout}>
         <section className={styles.itemList}>
           {initialItems.length === 0 ? (
             <p style={{ textAlign: "center", color: "#999" }}>
-              まだバックログはありません。最初の野望を登録しましょう！
+              {t("noBacklogs")}
             </p>
           ) : (
             initialItems.map((item) => (
               <div key={item.id} className={styles.card}>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.itemTitle}>
-                    {item.subject}は{item.title}
+                    {item.subject}{t("subjectTitleSeparator")}{item.title}
                   </h2>
                   <span className={styles.points}>{item.storyPoints} pts</span>
                 </div>
 
                 <div className={styles.whySection}>
-                  <strong>なぜなら:</strong> {item.why}
+                  <strong>{t("whyLabel")}</strong> {item.why}
                 </div>
 
                 {item.description && (
                   <div className={styles.details}>
-                    <strong>Description:</strong>
+                    <strong>{t("descriptionLabel")}</strong>
                     <p className={styles.description}>{item.description}</p>
                   </div>
                 )}
 
                 {item.acceptanceCriteria && (
                   <div className={styles.details}>
-                    <strong>Acceptance Criteria:</strong>
+                    <strong>{t("acceptanceCriteriaLabel")}</strong>
                     <p className={styles.acceptanceCriteria}>
                       {item.acceptanceCriteria}
                     </p>
@@ -61,11 +64,11 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
                     }}
                     className={styles.editButton}
                   >
-                    編集
+                    {tc("edit")}
                   </button>
                   <form action={deleteBacklogItemAction.bind(null, item.id)}>
                     <button type="submit" className={styles.deleteButton}>
-                      削除
+                      {tc("delete")}
                     </button>
                   </form>
                 </div>

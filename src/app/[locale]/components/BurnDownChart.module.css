@@ -5,11 +5,14 @@
     margin-bottom: 3rem;
     padding-bottom: 1rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .chartWrapper {
     width: 100%;
-    height: calc(100% - 3rem); /* タイトルとパラグラフの分を引く */
+    flex: 1;
+    min-height: 300px;
 }
 
 .rechartsSurface {

@@ -78,7 +78,7 @@ export class SqliteBurnDownSnapshotRepository implements BurnDownSnapshotReposit
       row.sprintId,
       row.date,
       row.remainingPulse,
-      row.createdAt,
+      row.createdAt ?? undefined,
     );
   }
 }

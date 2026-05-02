@@ -8,8 +8,9 @@ import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase
 import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import { ManageTaskUseCase } from "@/application/use-cases/ManageTaskUseCase";
 import { ManageTodoUseCase } from "@/application/use-cases/ManageTodoUseCase";
-import PlanningBoard from "./PlanningBoard";
+import PlanningBoard, { SprintItemWithTasks } from "./PlanningBoard";
 import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
 import type {
   Sprint,
   Capacity,
@@ -23,9 +24,11 @@ export const dynamic = "force-dynamic";
 export default async function SprintDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
-  const { id } = await params;
+  const { locale, id } = await params;
+  console.log("SprintDetailPage: locale =", locale, "id =", id);
+  setRequestLocale(locale);
 
   const sprintRepository = new SqliteSprintRepository();
   const capacityRepository = new SqliteCapacityRepository();

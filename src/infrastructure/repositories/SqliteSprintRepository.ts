@@ -68,8 +68,8 @@ export class SqliteSprintRepository implements SprintRepository {
       row.goal,
       row.status as SprintStatus,
       row.retrospective,
-      row.createdAt,
-      row.updatedAt,
+      row.createdAt ?? undefined,
+      row.updatedAt ?? undefined,
     );
   }
 }

@@ -61,6 +61,7 @@
 
 - Webアプリ
 - 詳細は今後決めていく
+- **多言語対応**: i18n
 - **環境管理**: mise
 
 ## コーディング規約（Coding Style Guidelines）

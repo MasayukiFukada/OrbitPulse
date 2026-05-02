@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import styles from "./PomodoroTimer.module.css";
 import { usePomodoro } from "./PomodoroContext";
 
@@ -18,6 +19,7 @@ export default function PomodoroTimer({
   defaultBreakMinutes = 5,
 }: PomodoroTimerProps) {
   const { state, timeLeft, startBreak, stopPomodoro } = usePomodoro();
+  const t = useTranslations("pomodoro");
   const prevTimeLeft = useRef(timeLeft);
 
   useEffect(() => {
@@ -30,20 +32,20 @@ export default function PomodoroTimer({
   const handleTimerEnd = async () => {
     if (state.status === "work") {
       // 作業終了 -> 通知 & 休憩開始
-      sendNotification("作業終了！", `${defaultWorkMinutes}分間のポモドーロが完了しました。${defaultBreakMinutes}分間の休憩を取ってください。`);
+      sendNotification(t('workEndedTitle'), t('workEndedBody', { workMinutes: defaultWorkMinutes, breakMinutes: defaultBreakMinutes }));
       startBreak(defaultBreakMinutes);
       if (state.taskId) {
         await onComplete(state.taskId, state.isTodoTask);
       }
     } else if (state.status === "break") {
       // 休憩終了 -> 通知 & 終了
-      sendNotification("休憩終了！", "休憩時間が終わりました。次のタスクを始めましょう！");
+      sendNotification(t('breakEndedTitle'), t('breakEndedBody'));
       stopPomodoro();
     }
   };
 
   const cancelTimer = () => {
-    if (confirm("ポモドーロを中止しますか？")) {
+    if (confirm(t('cancelConfirm'))) {
       stopPomodoro();
     }
   };
@@ -69,13 +71,13 @@ export default function PomodoroTimer({
     <div className={styles.overlay}>
       <div className={styles.timerCard}>
         <h3 className={`${styles.statusText} ${isBreak ? styles.breakText : ""}`}>
-          {isBreak ? "☕ 休憩中" : "🔥 作業中"}
+          {isBreak ? t('statusBreak') : t('statusWork')}
         </h3>
         <div className={`${styles.taskTitle} ${isBreak ? styles.breakText : ""}`}>{state.taskTitle}</div>
         <div className={`${styles.timeDisplay} ${isBreak ? styles.breakText : ""}`}>{formatTime(timeLeft)}</div>
         <div className={styles.controls}>
           <button onClick={cancelTimer} className={styles.cancelBtn}>
-            中止
+            {t('cancelButton')}
           </button>
         </div>
       </div>

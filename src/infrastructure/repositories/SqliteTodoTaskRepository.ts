@@ -85,9 +85,9 @@ export class SqliteTodoTaskRepository implements TodoTaskRepository {
       row.estimatedPulse,
       row.actualPulse,
       row.deadline,
-      row.priority,
-      row.createdAt,
-      row.updatedAt,
+      row.priority ?? 0,
+      row.createdAt ?? undefined,
+      row.updatedAt ?? undefined,
     );
   }
 }

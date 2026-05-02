@@ -60,8 +60,8 @@ export class SqliteTaskRepository implements TaskRepository {
       row.status as TaskStatus,
       row.estimatedPulse,
       row.actualPulse,
-      row.createdAt,
-      row.updatedAt,
+      row.createdAt ?? undefined,
+      row.updatedAt ?? undefined,
     );
   }
 }

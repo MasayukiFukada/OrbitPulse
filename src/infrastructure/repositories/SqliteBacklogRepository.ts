@@ -71,12 +71,12 @@ export class SqliteBacklogRepository implements BacklogRepository {
       row.why,
       row.description,
       row.acceptanceCriteria,
-      row.storyPoints,
+      row.storyPoints ?? 0,
       row.status as BacklogItemStatus,
       row.sprintId,
-      row.priority,
-      row.createdAt,
-      row.updatedAt,
+      row.priority ?? 0,
+      row.createdAt ?? undefined,
+      row.updatedAt ?? undefined,
     );
   }
 }
