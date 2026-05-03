@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OrbitPulse
 
-## Getting Started
+![OrbitPulse Logo](public/images/OrbitPulse_Logo.png)
 
-First, run the development server:
+個人のためのスクラム管理システム。休憩時間も考慮し、ゲーミフィケーションも取り入れたい。
+
+## 環境構築
+
+1. リポジトリをクローン
+```bash
+git clone <repository-url>
+cd OrbitPulse
+```
+
+2. 依存関係をインストール ※ あらかじめ mise が入っていること
+```bash
+mise install
+npm install
+```
+
+3. 環境変数を設定（開発用）
+```bash
+cp .env.example .env
+# 必要に応じて .env を編集
+```
+
+## 開発サーバーの起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) にアクセス。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 多言語対応
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- URLベースのルーティング（`/ja/...`、`/en/...`）
+- `next-intl` を使用
+- 言語切り替えはヘッダーのセレクトボックスから可能
 
-## Learn More
+## 主な機能
 
-To learn more about Next.js, take a look at the following resources:
+- **スプリント管理**: 計画、実行、振り返り
+- **ポモドーロタイマー**: 25分作業 + 5分休憩
+- **バーンダウンチャート**: 進捗可視化
+- **キャパシティ管理**: 日ごとの作業可能量を管理
+- **多言語対応**: 日本語・英語対応
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 技術スタック
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **フレームワーク**: Next.js (App Router)
+- **言語**: TypeScript
+- **スタイル**: CSS Modules
+- **データベース**: SQLite (better-sqlite3)
+- **多言語化**: next-intl
+- **グラフ**: Recharts
+- **環境管理**: mise
 
-## Deploy on Vercel
+## ドキュメント
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [アーキテクチャ](docs/architecture.md)
+- [データベース設計](docs/database.md)
+- [主要機能](docs/features.md)
+- [開発ガイド](docs/development.md)
+- [データベースのバックアップについて](docs/database-backup.md)
+- [アイディア帳](docs/ideas.md)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+詳細は `AGENTS.md` も参照してください。

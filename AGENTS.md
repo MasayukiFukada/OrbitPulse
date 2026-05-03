@@ -59,10 +59,14 @@
 
 ## 技術スタック
 
-- Webアプリ
-- 詳細は今後決めていく
-- **多言語対応**: i18n
+- **フレームワーク**: Next.js (App Router)
+- **言語**: TypeScript
+- **スタイル**: CSS Modules
+- **データベース**: SQLite (better-sqlite3)
+- **多言語対応**: next-intl（完了）
+- **グラフ描画**: Recharts
 - **環境管理**: mise
+- **パッケージ管理**: npm
 
 ## コーディング規約（Coding Style Guidelines）
 
@@ -83,13 +87,13 @@
 ## ビルド＆テスト手順（Build & Test）
 
 ### バックエンド
-- ビルド: ``
-- テスト: ``
-- 開発起動: ``
+- ビルド: `npm run build`
+- テスト: `npm test`
+- 開発起動: `npm run dev`
 
 ### フロントエンド
-- 開発起動: ``
-- ビルド: ``
+- 開発起動: `npm run dev`
+- ビルド: `npm run build`
 
 ## 知識＆ライブラリ（Knowledge & Library）
 
@@ -99,6 +103,10 @@
 
 - ファイルが増える場合などは .gitignore をメンテナンスする
 - ドキュメントは `docs/` 配下に Markdown 形式で残す。
+    - [アーキテクチャ](docs/architecture.md)
+    - [データベース設計](docs/database.md)
+    - [主要機能](docs/features.md)
+    - [開発ガイド](docs/development.md)
 - 変更を加える際は `PLAN.md` を更新し、進捗を管理する。
 
 ## その他指示
@@ -106,3 +114,14 @@
 - 全て日本語(関西弁)で応答すること。
 - 変更を加える際には計画を立て、ユーザーの許可を得てから作業を行うこと。
 - ベストな実装方法（クリーンコード、デザインパターン等）を積極的に提案すること。
+
+## 多言語対応の進捗（2026-05-03 完了）
+
+- **完了**: next-intl による多言語化（日本語・英語）
+- **対応済みコンポーネント**:
+  - PlanningBoard.tsx（全翻訳キー置換完了）
+  - PomodoroTimer.tsx / PomodoroStatusDisplay.tsx
+  - BurnDownChart.tsx（ツールチップ・凡例）
+  - LanguageSwitcher.tsx
+- **翻訳ファイル**: `src/i18n/messages/en.json`, `src/i18n/messages/ja.json`
+- **ルーティング**: `/[locale]/...` 形式（middleware.ts）
