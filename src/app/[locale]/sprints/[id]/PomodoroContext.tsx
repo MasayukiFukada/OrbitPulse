@@ -44,6 +44,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as PomodoroState;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState(parsed);
       } catch (e) {
         console.error("Failed to parse pomodoro state", e);
@@ -63,6 +64,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
   // カウントダウン処理
   useEffect(() => {
     if (state.status === "idle" || !state.startTime) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTimeLeft(0);
       return;
     }

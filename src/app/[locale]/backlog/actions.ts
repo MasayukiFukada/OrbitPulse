@@ -1,11 +1,13 @@
 "use server";
 
-import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
+import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
+import { LowDbTaskRepository } from "@/infrastructure/repositories/LowDbTaskRepository";
 import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import { revalidatePath } from "next/cache";
 
-const repository = new SqliteBacklogRepository();
-const useCase = new ManageBacklogUseCase(repository);
+const repository = new LowDbBacklogRepository();
+const taskRepository = new LowDbTaskRepository();
+const useCase = new ManageBacklogUseCase(repository, taskRepository);
 
 export async function addBacklogItemAction(formData: FormData) {
   const subject = (formData.get("subject") as string) || "私";

@@ -6,14 +6,12 @@ import styles from "./PomodoroTimer.module.css";
 import { usePomodoro } from "./PomodoroContext";
 
 interface PomodoroTimerProps {
-  onStart: (taskId: string, isTodoTask: boolean) => Promise<void>;
   onComplete: (taskId: string, isTodoTask: boolean) => Promise<void>;
   defaultWorkMinutes?: number;
   defaultBreakMinutes?: number;
 }
 
 export default function PomodoroTimer({
-  onStart,
   onComplete,
   defaultWorkMinutes = 25,
   defaultBreakMinutes = 5,
@@ -22,37 +20,36 @@ export default function PomodoroTimer({
   const t = useTranslations("pomodoro");
   const prevTimeLeft = useRef(timeLeft);
 
-  useEffect(() => {
-    if (timeLeft === 0 && prevTimeLeft.current > 0) {
-      handleTimerEnd();
+  const sendNotification = (title: string, body: string) => {
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+      new Notification(title, { body, icon: "/images/OrbitPulse_Logo.png" });
     }
-    prevTimeLeft.current = timeLeft;
-  }, [timeLeft]);
+  };
 
   const handleTimerEnd = async () => {
     if (state.status === "work") {
-      // 作業終了 -> 通知 & 休憩開始
       sendNotification(t('workEndedTitle'), t('workEndedBody', { workMinutes: defaultWorkMinutes, breakMinutes: defaultBreakMinutes }));
       startBreak(defaultBreakMinutes);
       if (state.taskId) {
         await onComplete(state.taskId, state.isTodoTask);
       }
     } else if (state.status === "break") {
-      // 休憩終了 -> 通知 & 終了
       sendNotification(t('breakEndedTitle'), t('breakEndedBody'));
       stopPomodoro();
     }
   };
 
+  useEffect(() => {
+    if (timeLeft === 0 && prevTimeLeft.current > 0) {
+      handleTimerEnd();
+    }
+    prevTimeLeft.current = timeLeft;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft]);
+
   const cancelTimer = () => {
     if (confirm(t('cancelConfirm'))) {
       stopPomodoro();
-    }
-  };
-
-  const sendNotification = (title: string, body: string) => {
-    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-      new Notification(title, { body, icon: "/images/OrbitPulse_Logo.png" });
     }
   };
 

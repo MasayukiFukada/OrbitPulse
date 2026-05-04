@@ -1,12 +1,47 @@
 import { BacklogItem, BacklogItemStatus } from "@/domain/entities/BacklogItem";
 import { BacklogRepository } from "@/domain/repositories/BacklogRepository";
+import { TaskRepository } from "@/domain/repositories/TaskRepository";
 import { nanoid } from "nanoid";
 
+export interface BacklogItemWithStats extends BacklogItem {
+  taskStats: {
+    total: number;
+    done: number;
+    pooled: number;
+    todo: number;
+    doing: number;
+  };
+}
+
 export class ManageBacklogUseCase {
-  constructor(private backlogRepository: BacklogRepository) {}
+  constructor(
+    private backlogRepository: BacklogRepository,
+    private taskRepository: TaskRepository,
+  ) {}
 
   async getBacklogItems(): Promise<BacklogItem[]> {
     return this.backlogRepository.findAll();
+  }
+
+  async getBacklogItemsWithStats(): Promise<BacklogItemWithStats[]> {
+    const items = await this.backlogRepository.findAll();
+    const itemsWithStats = await Promise.all(
+      items.map(async (item) => {
+        const tasks = await this.taskRepository.findByBacklogItemId(item.id);
+        const stats = {
+          total: tasks.length,
+          done: tasks.filter((t) => t.status === "done").length,
+          pooled: tasks.filter((t) => t.status === "pooled").length,
+          todo: tasks.filter((t) => t.status === "todo").length,
+          doing: tasks.filter((t) => t.status === "doing").length,
+        };
+        return {
+          ...item,
+          taskStats: stats,
+        } as BacklogItemWithStats;
+      }),
+    );
+    return itemsWithStats;
   }
 
   async addBacklogItem(data: {

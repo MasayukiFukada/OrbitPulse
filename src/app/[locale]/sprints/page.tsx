@@ -1,23 +1,22 @@
-import { SqliteSprintRepository } from "@/infrastructure/repositories/SqliteSprintRepository";
-import { SqliteCapacityRepository } from "@/infrastructure/repositories/SqliteCapacityRepository";
-import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
+import { LowDbSprintRepository } from "@/infrastructure/repositories/LowDbSprintRepository";
+import { LowDbCapacityRepository } from "@/infrastructure/repositories/LowDbCapacityRepository";
+import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
 import SprintList from "./SprintList";
-import type { Sprint } from "@/infrastructure/db/schema";
 
 export const dynamic = "force-dynamic";
 
 export default async function SprintsPage() {
-  const sprintRepository = new SqliteSprintRepository();
-  const capacityRepository = new SqliteCapacityRepository();
-  const backlogRepository = new SqliteBacklogRepository();
+  const sprintRepository = new LowDbSprintRepository();
+  const capacityRepository = new LowDbCapacityRepository();
+  const backlogRepository = new LowDbBacklogRepository();
   const useCase = new ManageSprintUseCase(
     sprintRepository,
     capacityRepository,
     backlogRepository,
   );
 
-  const sprints = await useCase.getSprints();
+  const sprints = await useCase.getSprintsWithCapacities();
 
   // シリアライズ可能な形式に変換
   const plainSprints = sprints.map((sprint) => ({
@@ -30,7 +29,14 @@ export default async function SprintsPage() {
     retrospective: sprint.retrospective,
     createdAt: sprint.createdAt,
     updatedAt: sprint.updatedAt,
+    capacities: sprint.capacities.map(c => ({
+      id: c.id,
+      sprintId: c.sprintId,
+      date: c.date,
+      pulseCount: c.pulseCount,
+      note: c.note
+    }))
   }));
 
-  return <SprintList initialSprints={plainSprints as unknown as Sprint[]} />;
+  return <SprintList initialSprints={plainSprints as never} />;
 }

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  updateCapacitiesAction,
   addItemToSprintAction,
   removeItemFromSprintAction,
   updateSprintStatusAction,
@@ -31,15 +30,12 @@ import BurnDownChart, {
 } from "@/app/[locale]/components/BurnDownChart";
 import PomodoroTimer from "./PomodoroTimer";
 import { PomodoroProvider, usePomodoro } from "./PomodoroContext";
-import PomodoroStatusDisplay from "./PomodoroStatusDisplay";
 import { TaskStatus } from "@/domain/entities/Task";
-import type {
-  Sprint,
-  Capacity,
-  BurnDownSnapshot,
-  BacklogItem,
-  TodoTask,
-} from "@/infrastructure/db/schema";
+import { SprintStatus } from "@/domain/entities/Sprint";
+import { Capacity } from "@/domain/entities/Capacity";
+import { BurnDownSnapshot } from "@/domain/entities/BurnDownSnapshot";
+import { BacklogItem } from "@/domain/entities/BacklogItem";
+import { TodoTask } from "@/domain/entities/TodoTask";
 
 type TaskWithStatus = {
   id: string;
@@ -53,8 +49,20 @@ export type SprintItemWithTasks = BacklogItem & {
   tasks: TaskWithStatus[];
 };
 
+type SprintData = {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  goal: string | null;
+  status: SprintStatus;
+  retrospective?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 interface PlanningBoardProps {
-  sprint: Sprint;
+  sprint: SprintData;
   initialCapacities: Capacity[];
   snapshots: BurnDownSnapshot[];
   sprintItems: SprintItemWithTasks[];
@@ -99,8 +107,6 @@ function PlanningBoardInner({
   const { startPomodoro } = usePomodoro();
   const t = useTranslations("sprints");
   const locale = useLocale();
-  const [capacities, setCapacities] = useState(initialCapacities);
-  const [isSaving, setIsSaving] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState<{ [key: string]: string }>(
     {},
   );
@@ -108,7 +114,6 @@ function PlanningBoardInner({
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [newTodoEst, setNewTodoEst] = useState(0);
   const [newTodoDeadline, setNewTodoDeadline] = useState("");
-  const [holidays, setHolidays] = useState<Set<string>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
     new Set(["todo", "doing", "done", "pooled"]),
   );
@@ -148,7 +153,7 @@ function PlanningBoardInner({
     taskId: string,
     isTodoTask: boolean,
   ) => {
-    // 完了時の追加アクションがあればここに記述
+    console.debug(`Pomodoro completed: taskId=${taskId}, isTodoTask=${isTodoTask}`);
   };
 
   const toggleStatus = (status: string) => {
@@ -170,20 +175,14 @@ function PlanningBoardInner({
     done: 4,
   };
 
-  useEffect(() => {
-    fetch("https://holidays-jp.github.io/api/v1/date.json")
-      .then((res) => res.json())
-      .then((data: { [key: string]: string }) => {
-        setHolidays(new Set(Object.keys(data)));
-      })
-      .catch(() => {});
-  }, []);
-
-  const totalCapacity = capacities.reduce((sum, c) => sum + c.pulseCount, 0);
+  const totalCapacity = initialCapacities.reduce((sum, c) => sum + c.pulseCount, 0);
   const totalPoints = sprintItems.reduce(
     (sum, item) => sum + (item.storyPoints ?? 0),
     0,
   );
+  // 使用されていない警告が出るが、将来的なロジックで必要になる可能性があるため
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _unused = { totalCapacity, totalPoints };
 
   // スプリント全体の合計実績Pulseと見積Pulse (PBIタスク + Todoタスク)
   // 総予定: pooled除く全タスクの見積もり合計
@@ -246,7 +245,7 @@ function PlanningBoardInner({
 
   // キャパシティマップ（日付文字列 → パルス数）
   const capacityMap: { [key: string]: number } = {};
-  capacities.forEach((c: Capacity) => {
+  initialCapacities.forEach((c: Capacity) => {
     const dateStr = formatDate(new Date(c.date));
     capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
   });
@@ -357,7 +356,7 @@ function PlanningBoardInner({
     return { chartData, totalPulse };
   };
 
-  const { chartData, totalPulse } = generateChartData();
+  const { chartData } = generateChartData();
 
   // 今日の進捗遅延をチェック（前日のスナップショットと比較）
   const todayCheck = new Date();
@@ -384,28 +383,9 @@ function PlanningBoardInner({
     isTodayBehind = completedToday < todayCapacity;
   }
 
-  const todayForStr = new Date();
-  const todayStr = `${todayForStr.getFullYear()}-${String(todayForStr.getMonth() + 1).padStart(2, "0")}-${String(todayForStr.getDate()).padStart(2, "0")}`;
-
   const formatDateForInput = (date: string | Date | null) => {
     if (!date) return "";
     return new Date(date).toISOString().split("T")[0];
-  };
-
-  const handlePulseChange = (id: string, delta: number) => {
-    setCapacities((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? { ...c, pulseCount: Math.max(0, c.pulseCount + delta) }
-          : c,
-      ),
-    );
-  };
-
-  const saveCapacities = async () => {
-    setIsSaving(true);
-    await updateCapacitiesAction(sprint.id, capacities);
-    setIsSaving(false);
   };
 
   const handleAddTask = async (backlogItemId: string) => {
@@ -529,91 +509,7 @@ function PlanningBoardInner({
         <BurnDownChart chartData={chartData} />
       </div>
 
-      <div className={styles.grid}>
-        <section className={styles.capacitySection}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>{t('capacities')}</h2>
-              <button
-                onClick={saveCapacities}
-                disabled={isSaving}
-                className={styles.saveButton}
-              >
-                {isSaving ? t('saving') : t('saveCapacity')}
-              </button>
-          </div>
-          <div className={styles.capacityList}>
-            {capacities.map((c) => {
-              const cDate = new Date(c.date);
-              const cYear = cDate.getFullYear();
-              const cMonth = String(cDate.getMonth() + 1).padStart(2, "0");
-              const cDay = String(cDate.getDate()).padStart(2, "0");
-              const cDateStr = `${cYear}-${cMonth}-${cDay}`;
-              const isToday = cDateStr === todayStr;
-              return (
-                <div
-                  key={c.id}
-                  className={`${styles.capacityRow} ${isToday ? styles.todayRow : ""}`}
-                >
-                  <div className={styles.dateInfo}>
-                    {(() => {
-                      const d = new Date(c.date);
-                      const dayOfWeek = d.getDay();
-                      const isSat = dayOfWeek === 6;
-                      const isSun = dayOfWeek === 0;
-                      const year = d.getFullYear();
-                      const month = String(d.getMonth() + 1).padStart(2, "0");
-                      const day = String(d.getDate()).padStart(2, "0");
-                      const dateStr = `${year}-${month}-${day}`;
-                      const isHoliday = holidays.has(dateStr);
-                      const dateClass = `${styles.date} ${isSat ? styles.saturday : ""} ${isSun ? styles.sunday : ""} ${isHoliday ? styles.holiday : ""}`;
-                      const dayClass = `${styles.day} ${isSat ? styles.saturday : ""} ${isSun ? styles.sunday : ""} ${isHoliday ? styles.holiday : ""}`;
-                      return (
-                        <>
-                          <span className={dateClass}>
-                            {d.toLocaleDateString("ja-JP", {
-                              weekday: "short",
-                            })}
-                          </span>
-                          <span className={dayClass}>{d.getDate()}</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                  <div className={styles.pulseControl}>
-                    <button
-                      onClick={() => handlePulseChange(c.id, -1)}
-                      className={styles.pulseBtn}
-                    >
-                      -
-                    </button>
-                    <span className={styles.pulseValue}>{c.pulseCount}</span>
-                    <button
-                      onClick={() => handlePulseChange(c.id, 1)}
-                      className={styles.pulseBtn}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={t('notePlaceholder')}
-                    className={styles.noteInput}
-                    value={c.note || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setCapacities((prev) =>
-                        prev.map((item) =>
-                          item.id === c.id ? { ...item, note: val } : item,
-                        ),
-                      );
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
+      <div className={styles.gridFull}>
         <section className={styles.itemsSection}>
           <h2 className={styles.sectionTitle}>{t('sprintBacklogByItems')}</h2>
           <div className={styles.filterContainer}>
@@ -1134,7 +1030,6 @@ function PlanningBoardInner({
         </section>
       </div>
       <PomodoroTimer
-        onStart={handleStartPomodoro}
         onComplete={handleCompletePomodoro}
       />
     </div>

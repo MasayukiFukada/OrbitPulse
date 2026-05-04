@@ -15,7 +15,7 @@
     "title": "Dashboard",
     "burnDownChart": "Burn Down Chart",
     "noActiveSprint": "No active sprint found. Please start a sprint.",
-    "currentSprint": "Current Sprint: {name}"
+    "currentSprint": "Current Sprint: <link>{name}</link>"
   },
   "backlog": {
     "title": "Product Backlog",
@@ -29,7 +29,13 @@
     "whyLabel": "Because:",
     "descriptionLabel": "Description:",
     "acceptanceCriteriaLabel": "Acceptance Criteria:",
-    "subjectTitleSeparator": ": "
+    "subjectTitleSeparator": ": ",
+    "taskStatus": "Task Status",
+    "done": "Done",
+    "pooled": "Pooled",
+    "todo": "Todo",
+    "doing": "Doing",
+    "total": "Total"
   },
   "sprints": {
     "title": "Sprints",

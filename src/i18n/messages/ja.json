@@ -15,7 +15,7 @@
     "title": "ダッシュボード",
     "burnDownChart": "バーンダウンチャート",
     "noActiveSprint": "アクティブなスプリントがありません。スプリントを開始してください。",
-    "currentSprint": "現在のスプリント: {name}"
+    "currentSprint": "現在のスプリント: <link>{name}</link>"
   },
   "backlog": {
     "title": "プロダクトバックログ",
@@ -29,7 +29,13 @@
     "whyLabel": "なぜなら:",
     "descriptionLabel": "Description:",
     "acceptanceCriteriaLabel": "Acceptance Criteria:",
-    "subjectTitleSeparator": "は"
+    "subjectTitleSeparator": "は",
+    "taskStatus": "タスク状況",
+    "done": "完了",
+    "pooled": "プール",
+    "todo": "未着手",
+    "doing": "進行中",
+    "total": "合計"
   },
   "sprints": {
     "title": "スプリント",

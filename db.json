@@ -1,0 +1,493 @@
+{
+  "sprints": [
+    {
+      "id": "L1lJ1DmeBC14q7InFbuCa",
+      "name": "Orbit Pulse開発",
+      "goal": "Orbit Pulseでスクラム開発を回せること",
+      "startDate": "2026-05-01T00:00:00.000Z",
+      "endDate": "2026-05-07T00:00:00.000Z",
+      "status": "completed",
+      "retrospective": null,
+      "createdAt": "2026-05-01T07:00:05.000Z",
+      "updatedAt": "2026-05-07T13:56:26.000Z",
+      "todoTasks": [],
+      "backlogItems": [],
+      "capacities": [
+        {
+          "id": "FCiJzf5PHfmm37-5C65id",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-01T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "HQaftkovvomp4MJdaXuGa",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-02T00:00:00.000Z",
+          "pulseCount": 2,
+          "note": null
+        },
+        {
+          "id": "YzlPXBJJ1BCvFhRGavnuT",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-03T00:00:00.000Z",
+          "pulseCount": 2,
+          "note": "多言語対応大変だったが完了。+1P"
+        },
+        {
+          "id": "RqTWnRV8vOoWWPvCZzQnv",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-04T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "tKtYwui1GpzDKvq5VcRJh",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-05T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "j-e0bgLkaP-tvCPadY1TE",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-06T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "IvB5nl39wp7InjMajzOXl",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-07T00:00:00.000Z",
+          "pulseCount": 0,
+          "note": "レトロスペクティブ+プランニング"
+        }
+      ],
+      "snapshots": [
+        {
+          "id": "kBFK7fFJHPDRJ3CJlRaf2",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-04-30T15:00:00.000Z",
+          "remainingPulse": 16,
+          "createdAt": "2026-05-01T07:00:07.000Z"
+        },
+        {
+          "id": "BYuiZ5cYIau5t3WL_z_sR",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-01T15:00:00.000Z",
+          "remainingPulse": 14,
+          "createdAt": "2026-05-01T23:12:31.000Z"
+        },
+        {
+          "id": "VO20pb6fDAgVmaYPhG85v",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-02T15:00:00.000Z",
+          "remainingPulse": 11,
+          "createdAt": "2026-05-02T23:17:50.000Z"
+        },
+        {
+          "id": "ifrVBkyaiEYzZ-nXXViq0",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-03T15:00:00.000Z",
+          "remainingPulse": 8,
+          "createdAt": "2026-05-04T00:17:31.000Z"
+        },
+        {
+          "id": "GG8Vnzx4l5VvHgoXjowGf",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-04T15:00:00.000Z",
+          "remainingPulse": 4,
+          "createdAt": "2026-05-05T13:04:40.000Z"
+        },
+        {
+          "id": "zpmksWpClolg5Zqivcq-H",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-05T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-06T12:48:49.000Z"
+        },
+        {
+          "id": "e9nd_jwcq7OmWge8hjXbL",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-06T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-07T13:56:03.000Z"
+        },
+        {
+          "id": "b55r5vIk1IlcsOHxBACqr",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-07T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-09T01:37:06.000Z"
+        },
+        {
+          "id": "45tYtMgtkO1tO5Ke2XSUL",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-08T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-09T01:37:06.000Z"
+        },
+        {
+          "id": "ggUE_FhvX_pX0pmhKAbzU",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-09T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-12T13:03:56.000Z"
+        },
+        {
+          "id": "eknc7FCN7ZuZcpPbeh694",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-10T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-12T13:03:56.000Z"
+        },
+        {
+          "id": "ULFzENEESBk4DKeN89y4i",
+          "sprintId": "L1lJ1DmeBC14q7InFbuCa",
+          "date": "2026-05-11T15:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-12T13:03:56.000Z"
+        }
+      ]
+    },
+    {
+      "id": "Udy073spx42fxOX_hCbOi",
+      "name": "OrbitPulse改修",
+      "goal": "MCP対応",
+      "startDate": "2026-05-11T00:00:00.000Z",
+      "endDate": "2026-05-17T00:00:00.000Z",
+      "status": "active",
+      "retrospective": null,
+      "createdAt": "2026-05-08T13:11:00.000Z",
+      "updatedAt": "2026-05-11T12:03:37.000Z",
+      "todoTasks": [],
+      "backlogItems": [
+        {
+          "id": "6kUPAOOsfuDwYOcBRX0yy",
+          "subject": "私",
+          "title": "OrbitPulseを開発したい",
+          "why": "スクラム開発が楽しかったからだ",
+          "description": "個人用のスクラム開発管理ツールを作成する",
+          "acceptanceCriteria": "- バーンダウンチャートが表示できること\r\n- スプリントを回せる\r\n- 生成AIとも協働できる",
+          "storyPoints": 13,
+          "status": "backlog",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "priority": 0,
+          "createdAt": "2026-05-01T06:26:43.000Z",
+          "updatedAt": "2026-05-08T13:26:49.000Z",
+          "tasks": [
+            {
+              "id": "5SKf4McifnWfQMQKMBExi",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "faviconを設定",
+              "status": "done",
+              "estimatedPulse": 1,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:01:59.000Z",
+              "updatedAt": "2026-05-02T13:36:24.000Z"
+            },
+            {
+              "id": "NmrpbckLmC-Rq6ze3vxLY",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ロゴを表示する",
+              "status": "done",
+              "estimatedPulse": 1,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:03:39.000Z",
+              "updatedAt": "2026-05-01T07:48:23.000Z"
+            },
+            {
+              "id": "y8D6a-5Nfc0-LJLGfodUA",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ダッシュボード画面のレイアウトを考える",
+              "status": "done",
+              "estimatedPulse": 4,
+              "actualPulse": 4,
+              "createdAt": "2026-05-01T07:06:14.000Z",
+              "updatedAt": "2026-05-05T13:28:19.000Z"
+            },
+            {
+              "id": "Vr1h4ypysNHX2QBP1r42-",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "アニメーションを追加する",
+              "status": "todo",
+              "estimatedPulse": 4,
+              "actualPulse": 0,
+              "createdAt": "2026-05-01T07:07:04.000Z",
+              "updatedAt": "2026-05-08T13:28:08.000Z"
+            },
+            {
+              "id": "TgkDoTD2dIvC_l9LZYTQY",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "多言語対応する",
+              "status": "done",
+              "estimatedPulse": 4,
+              "actualPulse": 8,
+              "createdAt": "2026-05-01T07:07:24.000Z",
+              "updatedAt": "2026-05-03T03:12:18.000Z"
+            },
+            {
+              "id": "0QkW0f7YZRV6dkvRtxu29",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ポモドーロタイマーを付ける",
+              "status": "done",
+              "estimatedPulse": 2,
+              "actualPulse": 4,
+              "createdAt": "2026-05-01T07:07:39.000Z",
+              "updatedAt": "2026-05-02T11:29:57.000Z"
+            },
+            {
+              "id": "r4ror2-vOMm9jHDaM9mAG",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "アラート用にPush通知に対応する",
+              "status": "done",
+              "estimatedPulse": 2,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:08:42.000Z",
+              "updatedAt": "2026-05-01T13:16:00.000Z"
+            },
+            {
+              "id": "oHt8doXoINIvBMznex3uq",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ドキュメントを作成する",
+              "status": "done",
+              "estimatedPulse": 2,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:09:24.000Z",
+              "updatedAt": "2026-05-04T12:35:56.000Z"
+            },
+            {
+              "id": "xfgn0S6v8BZCKlSxkMQMF",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "MCPでプランニングできる",
+              "status": "todo",
+              "estimatedPulse": 4,
+              "actualPulse": 0,
+              "createdAt": "2026-05-01T07:09:44.000Z",
+              "updatedAt": "2026-05-08T13:26:57.000Z"
+            },
+            {
+              "id": "1xNDNuaZjpUxe0b7D1qw9",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "MCPでレトロスペクティブできる",
+              "status": "todo",
+              "estimatedPulse": 4,
+              "actualPulse": 0,
+              "createdAt": "2026-05-01T07:10:05.000Z",
+              "updatedAt": "2026-05-08T13:26:58.000Z"
+            },
+            {
+              "id": "VudHlFc60Psq71ezMCkHh",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "キャパシティ入力をスプリント一覧画面に移動させたい",
+              "status": "done",
+              "estimatedPulse": 4,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:50:38.000Z",
+              "updatedAt": "2026-05-11T12:05:07.000Z"
+            },
+            {
+              "id": "Mcn3UdKEMvLAERkR4as6O",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "バックログの一覧画面で全タスク件数、完了タスク件数、保留タスク件数を表示したい",
+              "status": "done",
+              "estimatedPulse": 1,
+              "actualPulse": 1,
+              "createdAt": "2026-05-01T07:53:01.000Z",
+              "updatedAt": "2026-05-04T12:45:12.000Z"
+            },
+            {
+              "id": "hZSl_ooeYB_1AzaG8v1--",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ドキュメント指向DBに移行する",
+              "status": "done",
+              "estimatedPulse": 4,
+              "actualPulse": 2,
+              "createdAt": "2026-05-02T23:20:29.000Z",
+              "updatedAt": "2026-05-08T13:27:01.000Z"
+            },
+            {
+              "id": "XTLQhdw6wTUSMaGVOY2zE",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "スプリント画面のレイアウトを考える",
+              "status": "done",
+              "estimatedPulse": 4,
+              "actualPulse": 1,
+              "createdAt": "2026-05-05T13:27:48.000Z",
+              "updatedAt": "2026-05-07T13:56:39.000Z"
+            },
+            {
+              "id": "qcHV8EgjRzUjyYbZy1fXX",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "プロダクトバックログの折り畳みにも対応する",
+              "status": "done",
+              "estimatedPulse": 1,
+              "actualPulse": 1,
+              "createdAt": "2026-05-09T13:28:52.000Z",
+              "updatedAt": "2026-05-11T12:10:22.000Z"
+            },
+            {
+              "id": "kvrq7KMvV4M-LcF7G3RUG",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "ベロシティを計算する",
+              "status": "pooled",
+              "estimatedPulse": 1,
+              "actualPulse": 0,
+              "createdAt": "2026-05-12T13:04:25.000Z",
+              "updatedAt": "2026-05-12T13:04:32.000Z"
+            }
+          ]
+        }
+      ],
+      "capacities": [
+        {
+          "id": "1-8z3LujLXxzKhV0e2zyA",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-11T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "ZBZ3_CCcu-Bea-fBHuDRc",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-12T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "4ZyvYWHiSvcUcwMz5xlkH",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-13T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "pKM0YxZpsZZ0XAT6sYWvI",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-14T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "eh2JgE6d4QaRN69Frd9rQ",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-15T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "2eF0i0vE6Ne14caLM6ojm",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-16T00:00:00.000Z",
+          "pulseCount": 2,
+          "note": null
+        },
+        {
+          "id": "yCpnWSn2mPDf6QWmLMRbh",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-17T00:00:00.000Z",
+          "pulseCount": 0,
+          "note": "レトロ+プランニング"
+        }
+      ],
+      "snapshots": [
+        {
+          "id": "4INyEU0Qtt3mqDjY1DvTr",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-07T15:00:00.000Z",
+          "remainingPulse": 20,
+          "createdAt": "2026-05-08T13:11:25.000Z"
+        },
+        {
+          "id": "H1uFHLP0tTkZCtlqktBFr",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-08T15:00:00.000Z",
+          "remainingPulse": 21,
+          "createdAt": "2026-05-09T13:27:30.000Z"
+        },
+        {
+          "id": "CXTylZ5A0UntLwtPIEE-q",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-09T15:00:00.000Z",
+          "remainingPulse": 21,
+          "createdAt": "2026-05-10T14:31:07.000Z"
+        },
+        {
+          "id": "KSB76m9A_uL1IUNBi-3uh",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-10T15:00:00.000Z",
+          "remainingPulse": 16,
+          "createdAt": "2026-05-11T12:03:35.000Z"
+        },
+        {
+          "id": "q_momj6tLNDgy_ci3HTyf",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-11T15:00:00.000Z",
+          "remainingPulse": 12,
+          "createdAt": "2026-05-12T14:28:49.717Z"
+        }
+      ]
+    }
+  ],
+  "todoTasks": [
+    {
+      "id": "s748qIl2-HokhOk1NCugc",
+      "title": "ローカルLLMでコーディングする",
+      "sprintId": null,
+      "status": "pooled",
+      "estimatedPulse": 8,
+      "actualPulse": 0,
+      "deadline": null,
+      "priority": 0,
+      "createdAt": "2026-05-01T07:04:34.000Z",
+      "updatedAt": "2026-05-01T11:05:42.000Z"
+    }
+  ],
+  "backlogItems": [
+    {
+      "id": "3E4x_7pLYh27Rgq3tm1SA",
+      "subject": "私",
+      "title": "Workdaysを改修したい",
+      "why": "生成AIと連携させることでさらに便利になるからだ",
+      "description": "MCPと連携させたい",
+      "acceptanceCriteria": "- MCP で現状についてコメントしてもらえること\r\n- MCP で休む日を提案してもらえること",
+      "storyPoints": 2,
+      "status": "backlog",
+      "sprintId": null,
+      "priority": 0,
+      "createdAt": "2026-05-09T13:25:38.000Z",
+      "updatedAt": "2026-05-09T13:25:38.000Z",
+      "tasks": []
+    },
+    {
+      "id": "FFIxsR4LXRnYViAYQFqZD",
+      "subject": "私",
+      "title": "ExpenditureBookを改修したい",
+      "why": "生成AIと連携させることでさらに便利になるからだ",
+      "description": "MCPと連携させたい",
+      "acceptanceCriteria": "- MCP で各月の現状についてコメントしてもらえること\r\n- MCP で過去の支払いから支出を予想してもらえること\r\n- 外部からデータをインポートできること",
+      "storyPoints": 3,
+      "status": "backlog",
+      "sprintId": null,
+      "priority": 0,
+      "createdAt": "2026-05-09T13:27:18.000Z",
+      "updatedAt": "2026-05-09T13:56:14.000Z",
+      "tasks": []
+    },
+    {
+      "id": "mkutOKxrEITbMJQqxsioJ",
+      "subject": "私",
+      "title": "Back of Flyer Memoを改修したい",
+      "why": "入力を簡単にしたいからだ",
+      "description": "- Expenditure Book と連携させたい\r\n- ドキュメントDBを使いたい",
+      "acceptanceCriteria": "- バージョンアップを気軽にできること",
+      "storyPoints": 2,
+      "status": "backlog",
+      "sprintId": null,
+      "priority": 0,
+      "createdAt": "2026-05-10T14:30:42.000Z",
+      "updatedAt": "2026-05-10T14:30:42.000Z",
+      "tasks": []
+    }
+  ]
+}

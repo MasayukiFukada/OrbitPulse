@@ -1,21 +1,18 @@
-import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
+import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
+import { LowDbTaskRepository } from "@/infrastructure/repositories/LowDbTaskRepository";
 import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import BacklogList from "./BacklogList";
-import type { BacklogItem } from "@/domain/entities/BacklogItem";
 
 export const dynamic = "force-dynamic";
 
 export default async function BacklogPage() {
-  const repository = new SqliteBacklogRepository();
-  const useCase = new ManageBacklogUseCase(repository);
-  const items = await useCase.getBacklogItems();
+  const repository = new LowDbBacklogRepository();
+  const taskRepository = new LowDbTaskRepository();
+  const useCase = new ManageBacklogUseCase(repository, taskRepository);
+  const items = await useCase.getBacklogItemsWithStats();
 
-  // シリアライズ可能な形式に変換（エンティティクラスからプレーンオブジェクトへ）
-  const plainItems: Omit<BacklogItem, 'id' | 'createdAt' | 'updatedAt'> & {
-    id: string;
-    createdAt: Date | null;
-    updatedAt: Date | null;
-  } = items.map((item) => ({
+  // シリアライズ可能な形式に変換
+  const plainItems = items.map((item) => ({
     id: item.id,
     subject: item.subject,
     title: item.title,
@@ -24,12 +21,14 @@ export default async function BacklogPage() {
     acceptanceCriteria: item.acceptanceCriteria ?? '',
     storyPoints: item.storyPoints ?? 0,
     status: item.status,
+    sprintId: item.sprintId ?? null,
     priority: item.priority ?? 0,
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
-  })) as any;
+    taskStats: item.taskStats,
+  }));
 
   return (
-    <BacklogList initialItems={plainItems as unknown as BacklogItem[]} />
+    <BacklogList initialItems={plainItems} />
   );
 }

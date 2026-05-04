@@ -67,7 +67,8 @@ export default function BurnDownChart({ chartData }: BurnDownChartProps) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
-            <Tooltip content={CustomTooltip as any} />
+            {/* eslint-disable react-hooks/static-components, @typescript-eslint/no-explicit-any */}
+            <Tooltip content={<CustomTooltip /> as any} />
             {/* データエリア - 凡例の順序に影響されないように定義 */}
              <Area
                type="monotone"

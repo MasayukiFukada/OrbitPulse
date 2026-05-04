@@ -1,32 +1,40 @@
 "use server";
 
-import { SqliteSprintRepository } from "@/infrastructure/repositories/SqliteSprintRepository";
-import { SqliteCapacityRepository } from "@/infrastructure/repositories/SqliteCapacityRepository";
-import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
-import { SqliteTaskRepository } from "@/infrastructure/repositories/SqliteTaskRepository";
-import { SqliteTodoTaskRepository } from "@/infrastructure/repositories/SqliteTodoTaskRepository";
+import { LowDbSprintRepository } from "@/infrastructure/repositories/LowDbSprintRepository";
+import { LowDbCapacityRepository } from "@/infrastructure/repositories/LowDbCapacityRepository";
+import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
+import { LowDbTaskRepository } from "@/infrastructure/repositories/LowDbTaskRepository";
+import { LowDbTodoTaskRepository } from "@/infrastructure/repositories/LowDbTodoTaskRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
 import { ManageTaskUseCase } from "@/application/use-cases/ManageTaskUseCase";
 import { ManageTodoUseCase } from "@/application/use-cases/ManageTodoUseCase";
 import { revalidatePath } from "next/cache";
 import { Capacity } from "@/domain/entities/Capacity";
+import { SprintStatus } from "@/domain/entities/Sprint";
 import { TaskStatus } from "@/domain/entities/Task";
 import { TodoTaskStatus } from "@/domain/entities/TodoTask";
-import type {
-  Sprint,
-  Capacity as DbCapacity,
-} from "@/infrastructure/db/schema";
 
-const sprintRepository = new SqliteSprintRepository();
-const capacityRepository = new SqliteCapacityRepository();
-const backlogRepository = new SqliteBacklogRepository();
-const taskRepository = new SqliteTaskRepository();
-const todoTaskRepository = new SqliteTodoTaskRepository();
+type DbCapacity = {
+  id: string;
+  sprintId: string;
+  date: Date;
+  pulseCount: number;
+  note?: string | null;
+};
+
+const sprintRepository = new LowDbSprintRepository();
+const capacityRepository = new LowDbCapacityRepository();
+const backlogRepository = new LowDbBacklogRepository();
+const taskRepository = new LowDbTaskRepository();
+const todoTaskRepository = new LowDbTodoTaskRepository();
 
 const sprintUseCase = new ManageSprintUseCase(
   sprintRepository,
   capacityRepository,
   backlogRepository,
+  undefined, // burnDownSnapshotRepository
+  taskRepository,
+  todoTaskRepository,
 );
 const taskUseCase = new ManageTaskUseCase(taskRepository);
 const todoUseCase = new ManageTodoUseCase(todoTaskRepository);
@@ -60,7 +68,7 @@ export async function removeItemFromSprintAction(
 
 export async function updateSprintStatusAction(
   sprintId: string,
-  status: Sprint["status"],
+  status: SprintStatus,
 ) {
   const sprint = await sprintUseCase.getSprintById(sprintId);
   if (!sprint) return;

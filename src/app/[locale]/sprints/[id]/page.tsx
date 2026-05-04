@@ -1,23 +1,16 @@
-import { SqliteSprintRepository } from "@/infrastructure/repositories/SqliteSprintRepository";
-import { SqliteCapacityRepository } from "@/infrastructure/repositories/SqliteCapacityRepository";
-import { SqliteBacklogRepository } from "@/infrastructure/repositories/SqliteBacklogRepository";
-import { SqliteTaskRepository } from "@/infrastructure/repositories/SqliteTaskRepository";
-import { SqliteTodoTaskRepository } from "@/infrastructure/repositories/SqliteTodoTaskRepository";
-import { SqliteBurnDownSnapshotRepository } from "@/infrastructure/repositories/SqliteBurnDownSnapshotRepository";
+import { LowDbSprintRepository } from "@/infrastructure/repositories/LowDbSprintRepository";
+import { LowDbCapacityRepository } from "@/infrastructure/repositories/LowDbCapacityRepository";
+import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
+import { LowDbTaskRepository } from "@/infrastructure/repositories/LowDbTaskRepository";
+import { LowDbTodoTaskRepository } from "@/infrastructure/repositories/LowDbTodoTaskRepository";
+import { LowDbBurnDownSnapshotRepository } from "@/infrastructure/repositories/LowDbBurnDownSnapshotRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
 import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCase";
 import { ManageTaskUseCase } from "@/application/use-cases/ManageTaskUseCase";
 import { ManageTodoUseCase } from "@/application/use-cases/ManageTodoUseCase";
-import PlanningBoard, { SprintItemWithTasks } from "./PlanningBoard";
+import PlanningBoard from "./PlanningBoard";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import type {
-  Sprint,
-  Capacity,
-  BacklogItem,
-  TodoTask,
-  BurnDownSnapshot,
-} from "@/infrastructure/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -30,12 +23,12 @@ export default async function SprintDetailPage({
   console.log("SprintDetailPage: locale =", locale, "id =", id);
   setRequestLocale(locale);
 
-  const sprintRepository = new SqliteSprintRepository();
-  const capacityRepository = new SqliteCapacityRepository();
-  const backlogRepository = new SqliteBacklogRepository();
-  const taskRepository = new SqliteTaskRepository();
-  const todoTaskRepository = new SqliteTodoTaskRepository();
-  const burnDownSnapshotRepository = new SqliteBurnDownSnapshotRepository();
+  const sprintRepository = new LowDbSprintRepository();
+  const capacityRepository = new LowDbCapacityRepository();
+  const backlogRepository = new LowDbBacklogRepository();
+  const taskRepository = new LowDbTaskRepository();
+  const todoTaskRepository = new LowDbTodoTaskRepository();
+  const burnDownSnapshotRepository = new LowDbBurnDownSnapshotRepository();
   const sprintUseCase = new ManageSprintUseCase(
     sprintRepository,
     capacityRepository,
@@ -44,7 +37,7 @@ export default async function SprintDetailPage({
     taskRepository,
     todoTaskRepository,
   );
-  const backlogUseCase = new ManageBacklogUseCase(backlogRepository);
+  const backlogUseCase = new ManageBacklogUseCase(backlogRepository, taskRepository);
   const taskUseCase = new ManageTaskUseCase(taskRepository);
   const todoUseCase = new ManageTodoUseCase(todoTaskRepository);
 
@@ -79,8 +72,19 @@ export default async function SprintDetailPage({
     }),
   );
 
-  // スプリントに紐付いていないバックログアイテムを抽出
-  const availableItems = allBacklogItems.filter((item) => !item.sprintId);
+  // 完了していないスプリントのIDを取得
+  const allSprints = await sprintUseCase.getSprints();
+  const activeOrPlanningSprintIds = new Set(
+    allSprints
+      .filter((s) => s.status !== "completed")
+      .map((s) => s.id),
+  );
+
+  // 他の進行中/計画中スプリントに紐付いていないバックログアイテムを抽出
+  // (現在のスプリント ID も activeOrPlanningSprintIds に含まれるため、結果的に現在のスプリントのアイテムは除外される)
+  const availableItems = allBacklogItems.filter(
+    (item) => !item.sprintId || !activeOrPlanningSprintIds.has(item.sprintId),
+  );
 
   // シリアライズ可能な形式に変換
   const plainSprint = {
@@ -132,17 +136,18 @@ export default async function SprintDetailPage({
     sprintId: s.sprintId,
     date: s.date,
     remainingPulse: s.remainingPulse,
+    createdAt: s.createdAt,
   }));
 
   return (
     <PlanningBoard
-      sprint={plainSprint as unknown as Sprint}
-      initialCapacities={plainCapacities as unknown as Capacity[]}
-      snapshots={plainSnapshots as unknown as BurnDownSnapshot[]}
-      sprintItems={sprintItemsWithTasks as unknown as SprintItemWithTasks[]}
-      availableItems={plainAvailableItems as unknown as BacklogItem[]}
-      todoTasks={plainTodoTasks as unknown as TodoTask[]}
-      unassignedTodoTasks={plainUnassignedTodoTasks as unknown as TodoTask[]}
+      sprint={plainSprint as never}
+      initialCapacities={plainCapacities as never}
+      snapshots={plainSnapshots as never}
+      sprintItems={sprintItemsWithTasks as never}
+      availableItems={plainAvailableItems as never}
+      todoTasks={plainTodoTasks as never}
+      unassignedTodoTasks={plainUnassignedTodoTasks as never}
     />
   );
 }
