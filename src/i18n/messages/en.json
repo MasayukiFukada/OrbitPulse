@@ -15,7 +15,8 @@
     "title": "Dashboard",
     "burnDownChart": "Burn Down Chart",
     "noActiveSprint": "No active sprint found. Please start a sprint.",
-    "currentSprint": "Current Sprint: <link>{name}</link>"
+    "currentSprint": "Current Sprint: <link>{name}</link>",
+    "velocity": "Current Velocity: {value} pt"
   },
   "backlog": {
     "title": "Product Backlog",
@@ -107,7 +108,8 @@
   "chart": {
     "totalPulse": "Total Pulse",
     "idealRemaining": "Ideal Remaining",
-    "capacity": "Capacity"
+    "capacity": "Capacity",
+    "velocity": "Velocity"
   },
   "metadata": {
     "title": "OrbitPulse",

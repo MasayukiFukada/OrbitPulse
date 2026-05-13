@@ -92,7 +92,8 @@ export async function getDb() {
   if (dbInstance) return dbInstance;
 
   // 開発・実行環境に合わせてファイルパスを調整
-  dbInstance = await JSONFilePreset<Data>('db.json', defaultData);
+  const dbPath = process.env.DB_PATH || 'db.json';
+  dbInstance = await JSONFilePreset<Data>(dbPath, defaultData);
   return dbInstance;
 }
 

@@ -68,6 +68,14 @@
     border-bottom-color: var(--primary);
 }
 
+.velocityInfo {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #ffa500;
+    margin-bottom: 1.5rem;
+    padding-left: 1.25rem;
+}
+
 .noSprint {
     text-align: center;
     padding: 4rem 2rem;

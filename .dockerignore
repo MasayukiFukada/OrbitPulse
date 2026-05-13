@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.jj
+.env*
+npm-debug.log
+README.md
+docs
+AGENTS.md
+CLAUDE.md
+PLAN.md
+db.json

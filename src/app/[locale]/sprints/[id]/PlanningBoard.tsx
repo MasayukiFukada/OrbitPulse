@@ -69,6 +69,7 @@ interface PlanningBoardProps {
   availableItems: BacklogItem[];
   todoTasks: TodoTask[];
   unassignedTodoTasks: TodoTask[];
+  velocity: number;
 }
 
 export default function PlanningBoard({
@@ -79,6 +80,7 @@ export default function PlanningBoard({
   availableItems,
   todoTasks,
   unassignedTodoTasks,
+  velocity,
 }: PlanningBoardProps) {
   return (
     <PomodoroProvider>
@@ -90,6 +92,7 @@ export default function PlanningBoard({
         availableItems={availableItems}
         todoTasks={todoTasks}
         unassignedTodoTasks={unassignedTodoTasks}
+        velocity={velocity}
       />
     </PomodoroProvider>
   );
@@ -103,6 +106,7 @@ function PlanningBoardInner({
   availableItems,
   todoTasks,
   unassignedTodoTasks,
+  velocity,
 }: PlanningBoardProps) {
   const { startPomodoro } = usePomodoro();
   const t = useTranslations("sprints");
@@ -347,6 +351,7 @@ function PlanningBoardInner({
         ideal: idealValue,
         actual: actual,
         capacity: remainingCapacity,
+        velocity: dateStr <= todayStr ? velocity : null,
       });
 
       usedCapacity += dayCapacity;

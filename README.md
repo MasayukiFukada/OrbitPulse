@@ -32,6 +32,17 @@ npm run dev
 
 ブラウザで [http://localhost:3000](http://localhost:3000) にアクセス。
 
+## Docker での起動
+
+Docker Compose を使用して、アプリケーションを簡単に起動できます。
+
+```bash
+docker compose up --build
+```
+
+起動後、[http://localhost:3000](http://localhost:3000) にアクセスしてください。
+データは `data/db.json` に保存されます。
+
 ## 多言語対応
 
 - URLベースのルーティング（`/ja/...`、`/en/...`）
@@ -51,10 +62,10 @@ npm run dev
 - **フレームワーク**: Next.js (App Router)
 - **言語**: TypeScript
 - **スタイル**: CSS Modules
-- **データベース**: SQLite (better-sqlite3)
+- **データベース**: lowdb (JSONファイル)
 - **多言語化**: next-intl
 - **グラフ**: Recharts
-- **環境管理**: mise
+- **環境管理**: mise, Docker
 
 ## ドキュメント
 

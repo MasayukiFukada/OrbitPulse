@@ -1,3 +1,28 @@
+## 📝 MCP対応の進捗（2026-05-13）
+
+### 完了した作業
+1. **MCPサーバーの実装 (`src/mcp/server.ts`)**
+   - `@modelcontextprotocol/sdk` を導入
+   - 参照系ツール (`get_backlog_items`, `get_sprints`, `get_current_sprint`, `get_sprint_details`, `get_todo_tasks`) の実装
+   - 操作系ツール (`create_backlog_item`, `add_item_to_sprint`, `update_sprint`) の実装
+2. **実行環境の整備**
+   - `tsx` を導入し、TypeScript を直接実行可能に
+   - `package.json` に `npm run mcp` スクリプトを追加
+3. **動作確認**
+   - stdio 経由でのサーバー起動を確認
+
+### 未完了の作業
+1. **AIクライアントとの連携テスト**
+   - Claude Desktop 等の MCP クライアントから実際にツールを呼び出して動作確認する。
+2. **ツールの拡充**
+   - タスクの作成や更新、キャパシティの調整など、さらに細かい操作ツールの追加を検討。
+
+### 再開時の手順
+1. `npm run mcp` でサーバーが起動することを確認。
+2. MCP Inspector などを使用して、各ツールのレスポンスが正しいか詳細に検証する。
+
+---
+
 ## 🛠 明日の自分へのメモ
 - `better-sqlite3` のトランザクションは `async/await` 使ったらあかんで！
 - 画面が長くなってきたから、CSSの共通化（ボタンやカードのスタイル）を検討してもええかもな。

@@ -267,9 +267,9 @@
               "id": "xfgn0S6v8BZCKlSxkMQMF",
               "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
               "title": "MCPでプランニングできる",
-              "status": "todo",
+              "status": "done",
               "estimatedPulse": 4,
-              "actualPulse": 0,
+              "actualPulse": 1,
               "createdAt": "2026-05-01T07:09:44.000Z",
               "updatedAt": "2026-05-08T13:26:57.000Z"
             },
@@ -277,9 +277,9 @@
               "id": "1xNDNuaZjpUxe0b7D1qw9",
               "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
               "title": "MCPでレトロスペクティブできる",
-              "status": "todo",
+              "status": "done",
               "estimatedPulse": 4,
-              "actualPulse": 0,
+              "actualPulse": 1,
               "createdAt": "2026-05-01T07:10:05.000Z",
               "updatedAt": "2026-05-08T13:26:58.000Z"
             },
@@ -337,11 +337,21 @@
               "id": "kvrq7KMvV4M-LcF7G3RUG",
               "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
               "title": "ベロシティを計算する",
-              "status": "pooled",
+              "status": "done",
               "estimatedPulse": 1,
               "actualPulse": 0,
               "createdAt": "2026-05-12T13:04:25.000Z",
               "updatedAt": "2026-05-12T13:04:32.000Z"
+            },
+            {
+              "id": "1Mgf-YFsDPMoTcBlUNP2C",
+              "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
+              "title": "Dockerで両方とも(本体、MCP)サーバーが動くようにしたい",
+              "status": "done",
+              "estimatedPulse": 1,
+              "actualPulse": 0,
+              "createdAt": "2026-05-14T13:46:21.475Z",
+              "updatedAt": "2026-05-14T13:46:21.475Z"
             }
           ]
         }
@@ -437,8 +447,36 @@
           "id": "Q7ueehe5m-5dWZlisPvAQ",
           "sprintId": "Udy073spx42fxOX_hCbOi",
           "date": "2026-05-12T15:00:00.000Z",
-          "remainingPulse": 12,
-          "createdAt": "2026-05-13T13:30:33.138Z"
+          "remainingPulse": 4,
+          "createdAt": "2026-05-13T14:31:15.836Z"
+        },
+        {
+          "id": "U914KX7iiuDH5QNNMmPVq",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-13T15:00:00.000Z",
+          "remainingPulse": 6,
+          "createdAt": "2026-05-14T13:47:14.362Z"
+        },
+        {
+          "id": "oyVfvzS9TDe488pLsbrsA",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-14T00:00:00.000Z",
+          "remainingPulse": 6,
+          "createdAt": "2026-05-14T15:15:56.095Z"
+        },
+        {
+          "id": "u0IGk33nXaN-3mkuXbOTL",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-15T00:00:00.000Z",
+          "remainingPulse": 6,
+          "createdAt": "2026-05-16T04:29:40.213Z"
+        },
+        {
+          "id": "pYA30nWbcoY2S2K5RDZDm",
+          "sprintId": "Udy073spx42fxOX_hCbOi",
+          "date": "2026-05-16T00:00:00.000Z",
+          "remainingPulse": 4,
+          "createdAt": "2026-05-16T04:41:07.040Z"
         }
       ]
     }

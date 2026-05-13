@@ -15,7 +15,8 @@
     "title": "ダッシュボード",
     "burnDownChart": "バーンダウンチャート",
     "noActiveSprint": "アクティブなスプリントがありません。スプリントを開始してください。",
-    "currentSprint": "現在のスプリント: <link>{name}</link>"
+    "currentSprint": "現在のスプリント: <link>{name}</link>",
+    "velocity": "現在のベロシティ: {value} pt"
   },
   "backlog": {
     "title": "プロダクトバックログ",
@@ -107,7 +108,8 @@
   "chart": {
     "totalPulse": "総Pulse",
     "idealRemaining": "理想残Pulse",
-    "capacity": "キャパシティ"
+    "capacity": "キャパシティ",
+    "velocity": "ベロシティ"
   },
   "metadata": {
     "title": "OrbitPulse",

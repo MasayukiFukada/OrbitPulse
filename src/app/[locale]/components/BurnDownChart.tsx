@@ -17,6 +17,7 @@ export interface ChartData {
   ideal: number | null;
   actual: number | null;
   capacity?: number;
+  velocity?: number | null;
 }
 
 interface BurnDownChartProps {
@@ -33,9 +34,10 @@ export default function BurnDownChart({ chartData }: BurnDownChartProps) {
   }) {
     if (!active || !payload) return null;
     const order = [
-      { dataKey: "actual", name: t('totalPulse'), color: "#d3381c" },
-      { dataKey: "ideal", name: t('idealRemaining'), color: "#1e50a2" },
-      { dataKey: "capacity", name: t('capacity'), color: "#2e8b57" },
+      { dataKey: "actual", name: t('totalPulse'), color: "#d3381c", unit: "P" },
+      { dataKey: "ideal", name: t('idealRemaining'), color: "#1e50a2", unit: "P" },
+      { dataKey: "capacity", name: t('capacity'), color: "#2e8b57", unit: "P" },
+      { dataKey: "velocity", name: t('velocity'), color: "#ffa500", unit: "pt" },
     ];
     return (
       <div
@@ -51,7 +53,7 @@ export default function BurnDownChart({ chartData }: BurnDownChartProps) {
           if (!item) return null;
           return (
             <p key={o.dataKey} style={{ margin: 0, color: o.color }}>
-              {o.name}: {item.value} P
+              {o.name}: {item.value} {o.unit}
             </p>
           );
         })}
@@ -94,15 +96,25 @@ export default function BurnDownChart({ chartData }: BurnDownChartProps) {
                fillOpacity={0.2}
                name={t('capacity')}
              />
+             <Area
+               type="stepAfter"
+               dataKey="velocity"
+               stroke="#ffa500"
+               fill="none"
+               strokeDasharray="5 5"
+               strokeWidth={2}
+               name={t('velocity')}
+             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      {/* カスタム凡例を固定順序（総Pulse → 理想残Pulse → キャパシティ）で表示 */}
+      {/* カスタム凡例を固定順序 */}
       <div
         style={{
           display: "flex",
           justifyContent: "center",
-          gap: "1.5rem",
+          flexWrap: "wrap",
+          gap: "1rem 1.5rem",
           padding: "0.5rem",
         }}
       >
@@ -141,6 +153,17 @@ export default function BurnDownChart({ chartData }: BurnDownChartProps) {
             }}
           />
           <span style={{ fontSize: "0.875rem" }}>{t('capacity')}</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div
+            style={{
+              width: 14,
+              height: 2,
+              backgroundColor: "#ffa500",
+              borderTop: "2px dashed #ffa500",
+            }}
+          />
+          <span style={{ fontSize: "0.875rem" }}>{t('velocity')}</span>
         </div>
       </div>
     </div>

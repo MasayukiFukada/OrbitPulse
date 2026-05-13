@@ -78,6 +78,7 @@ export default async function DashboardPage() {
   // キャパシティとスナップショットを取得
   const capacities = await sprintUseCase.getCapacities(activeSprint.id);
   const snapshots = await sprintUseCase.getSnapshots(activeSprint.id);
+  const velocity = await sprintUseCase.calculateVelocity(activeSprint.id);
 
   // 日付フォーマット関数 (MM/DD)
   const formatDate = (date: Date) => {
@@ -154,6 +155,7 @@ export default async function DashboardPage() {
       ideal: idealValue,
       actual: actual,
       capacity: remainingCapacity,
+      velocity: dateStr <= todayStr ? velocity : null,
     });
 
     usedCapacity += dayCapacity;
@@ -194,6 +196,9 @@ export default async function DashboardPage() {
               ),
             })}
           </h2>
+          <div className={styles.velocityInfo}>
+            {t("velocity", { value: velocity })}
+          </div>
           <BurnDownChart chartData={chartData} />
         </section>
       </div>

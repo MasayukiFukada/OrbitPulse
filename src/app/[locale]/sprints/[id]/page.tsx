@@ -48,6 +48,7 @@ export default async function SprintDetailPage({
   await sprintUseCase.fillMissingSnapshots(id);
   await sprintUseCase.takeSnapshot(id);
 
+  const velocity = await sprintUseCase.calculateVelocity(id);
   const capacities = await sprintUseCase.getCapacities(id);
   const snapshots = await sprintUseCase.getSnapshots(id);
   const sprintItems = await sprintUseCase.getItemsInSprint(id);
@@ -148,6 +149,7 @@ export default async function SprintDetailPage({
       availableItems={plainAvailableItems as never}
       todoTasks={plainTodoTasks as never}
       unassignedTodoTasks={plainUnassignedTodoTasks as never}
+      velocity={velocity}
     />
   );
 }

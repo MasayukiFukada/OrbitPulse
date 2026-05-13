@@ -1,6 +1,6 @@
 # データベース設計
 
-OrbitPulse はデータベースに **SQLite** を、ORM に **Drizzle ORM** を使用しています。
+OrbitPulse はデータベースに **lowdb** (JSONファイル) を使用しています。
 
 ## エンティティ図（論理構造）
 
@@ -95,11 +95,3 @@ erDiagram
 
 ### burn_down_snapshots
 バーンダウンチャートを描画するための履歴データ。
-
-## マイグレーション
-
-Drizzle Kit を使用しています。
-```bash
-# スキーマの変更を反映
-npm run db:push
-```

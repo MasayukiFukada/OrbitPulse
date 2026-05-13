@@ -205,6 +205,19 @@ export class ManageSprintUseCase {
     return allItems.filter((item) => item.sprintId === sprintId);
   }
 
+  async calculateVelocity(sprintId: string): Promise<number> {
+    const items = await this.getItemsInSprint(sprintId);
+    // すべてのタスクが 'done' であるアイテムのストーリーポイントを合計する
+    let velocity = 0;
+    for (const item of items) {
+      const isDone = await this.isBacklogItemDone(item.id);
+      if (isDone) {
+        velocity += item.storyPoints;
+      }
+    }
+    return velocity;
+  }
+
   async calculateRemainingPulse(sprintId: string): Promise<number> {
     if (!this.taskRepository || !this.todoTaskRepository) {
       throw new Error("TaskRepository and TodoTaskRepository are required");
