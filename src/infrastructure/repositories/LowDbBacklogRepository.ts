@@ -5,6 +5,7 @@ import { getDb, RawSprint, RawBacklogItem } from "../db/json-db";
 export class LowDbBacklogRepository implements BacklogRepository {
   async findAll(): Promise<BacklogItem[]> {
     const db = await getDb();
+    await db.read();
     const items: BacklogItem[] = [];
     
     // 未割当のアイテム
@@ -24,6 +25,7 @@ export class LowDbBacklogRepository implements BacklogRepository {
 
   async findById(id: string): Promise<BacklogItem | null> {
     const db = await getDb();
+    await db.read();
     
     // 未割当から探す
     if (db.data.backlogItems) {
@@ -43,6 +45,7 @@ export class LowDbBacklogRepository implements BacklogRepository {
 
   async save(item: BacklogItem): Promise<void> {
     const db = await getDb();
+    await db.read();
     const raw = this.toRaw(item);
 
     if (item.sprintId) {
@@ -55,10 +58,11 @@ export class LowDbBacklogRepository implements BacklogRepository {
         const index = items.findIndex((i: RawBacklogItem) => i.id === item.id);
         
         if (index !== -1) {
-          // 既存タスクなどを保持しつつ更新
-          items[index] = { ...items[index], ...raw };
+          // 既存タスクを保持しつつ更新
+          const existingTasks = items[index].tasks || [];
+          items[index] = { ...raw, tasks: existingTasks };
         } else {
-          items.push(raw);
+          items.push({ ...raw, tasks: [] });
         }
 
         // 未割当リストや他のスプリントから削除
@@ -74,9 +78,11 @@ export class LowDbBacklogRepository implements BacklogRepository {
       if (!db.data.backlogItems) db.data.backlogItems = [];
       const index = db.data.backlogItems.findIndex((i: RawBacklogItem) => i.id === item.id);
       if (index !== -1) {
-        db.data.backlogItems[index] = { ...db.data.backlogItems[index], ...raw };
+        // 既存タスクを保持しつつ更新
+        const existingTasks = db.data.backlogItems[index].tasks || [];
+        db.data.backlogItems[index] = { ...raw, tasks: existingTasks };
       } else {
-        db.data.backlogItems.push(raw);
+        db.data.backlogItems.push({ ...raw, tasks: [] });
       }
 
       // 全スプリントから削除
@@ -118,7 +124,7 @@ export class LowDbBacklogRepository implements BacklogRepository {
     );
   }
 
-  private toRaw(item: BacklogItem): RawBacklogItem {
+  private toRaw(item: BacklogItem): Omit<RawBacklogItem, "tasks"> {
     return {
       id: item.id,
       subject: item.subject,
@@ -132,7 +138,6 @@ export class LowDbBacklogRepository implements BacklogRepository {
       priority: item.priority,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
-      tasks: [] // ネストされたタスク用
     };
   }
 }

@@ -5,6 +5,7 @@ import { getDb, RawSprint, RawBacklogItem, RawTask } from "../db/json-db";
 export class LowDbTaskRepository implements TaskRepository {
   async findByBacklogItemId(backlogItemId: string): Promise<Task[]> {
     const db = await getDb();
+    await db.read();
     
     // バックログアイテムの中から該当するものを探し、そのタスクを返す
     for (const s of db.data.sprints) {
@@ -29,6 +30,7 @@ export class LowDbTaskRepository implements TaskRepository {
 
   async findById(id: string): Promise<Task | null> {
     const db = await getDb();
+    await db.read();
     
     // 全てのバックログアイテムの中からタスクを探す
     const findInItems = (items: RawBacklogItem[]) => {
@@ -60,6 +62,7 @@ export class LowDbTaskRepository implements TaskRepository {
 
   async save(item: Task): Promise<void> {
     const db = await getDb();
+    await db.read();
     const raw = this.toRaw(item);
     let saved = false;
 

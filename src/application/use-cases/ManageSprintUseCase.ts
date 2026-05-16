@@ -219,32 +219,54 @@ export class ManageSprintUseCase {
   }
 
   async calculateRemainingPulse(sprintId: string): Promise<number> {
+    const stats = await this.getSprintPulseStats(sprintId);
+    return stats.totalEstPulse - stats.plannedActualPulse;
+  }
+
+  /**
+   * スプリント内のパルス統計を取得する
+   */
+  async getSprintPulseStats(sprintId: string): Promise<{
+    totalEstPulse: number;
+    plannedActualPulse: number;
+    totalActualPulse: number;
+  }> {
     if (!this.taskRepository || !this.todoTaskRepository) {
       throw new Error("TaskRepository and TodoTaskRepository are required");
     }
 
-    let remainingPulse = 0;
+    let totalEstPulse = 0;
+    let plannedActualPulse = 0;
+    let totalActualPulse = 0;
 
-    // スプリント内のバックログアイテム配下のタスクの未完了分を計算
+    // スプリント内のバックログアイテム配下のタスク
     const items = await this.getItemsInSprint(sprintId);
     for (const item of items) {
       const tasks = await this.taskRepository.findByBacklogItemId(item.id);
       for (const task of tasks) {
-        if (task.status !== "done" && task.status !== "pooled") {
-          remainingPulse += task.estimatedPulse;
+        if (task.status !== "pooled") {
+          totalEstPulse += task.estimatedPulse;
+          totalActualPulse += task.actualPulse;
+          if (task.status === "done") {
+            plannedActualPulse += task.estimatedPulse;
+          }
         }
       }
     }
 
-    // スプリント内のTodoタスクの未完了分を計算
+    // スプリント内のTodoタスク
     const todoTasks = await this.todoTaskRepository.findBySprintId(sprintId);
     for (const todoTask of todoTasks) {
-      if (todoTask.status !== "done" && todoTask.status !== "pooled") {
-        remainingPulse += todoTask.estimatedPulse;
+      if (todoTask.status !== "pooled") {
+        totalEstPulse += todoTask.estimatedPulse;
+        totalActualPulse += todoTask.actualPulse;
+        if (todoTask.status === "done") {
+          plannedActualPulse += todoTask.estimatedPulse;
+        }
       }
     }
 
-    return remainingPulse;
+    return { totalEstPulse, plannedActualPulse, totalActualPulse };
   }
 
   async takeSnapshot(sprintId: string, date?: Date): Promise<void> {

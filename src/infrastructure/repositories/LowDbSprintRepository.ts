@@ -6,6 +6,7 @@ import { RawSprint as RawSprintType } from "../db/json-db";
 export class LowDbSprintRepository implements SprintRepository {
   async findAll(): Promise<Sprint[]> {
     const db = await getDb();
+    await db.read();
     return [...db.data.sprints]
       .sort((a: RawSprint, b: RawSprint) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
       .map((s: RawSprint) => this.toEntity(s));
@@ -13,12 +14,14 @@ export class LowDbSprintRepository implements SprintRepository {
 
   async findById(id: string): Promise<Sprint | null> {
     const db = await getDb();
+    await db.read();
     const found = db.data.sprints.find((s: RawSprint) => s.id === id);
     return found ? this.toEntity(found) : null;
   }
 
   async findActive(): Promise<Sprint | null> {
     const db = await getDb();
+    await db.read();
     const found = db.data.sprints.find((s: RawSprint) => s.status === 'active');
     return found ? this.toEntity(found) : null;
   }
@@ -26,6 +29,7 @@ export class LowDbSprintRepository implements SprintRepository {
   async save(item: Sprint): Promise<void> {
     console.log(`Saving Sprint: ${item.name} (id: ${item.id})`);
     const db = await getDb();
+    await db.read();
     const index = db.data.sprints.findIndex((s: RawSprint) => s.id === item.id);
     
     if (index !== -1) {

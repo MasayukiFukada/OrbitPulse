@@ -5,6 +5,7 @@ import { getDb, RawSprint, RawTodoTask } from "../db/json-db";
 export class LowDbTodoTaskRepository implements TodoTaskRepository {
   async findBySprintId(sprintId: string): Promise<TodoTask[]> {
     const db = await getDb();
+    await db.read();
     const sprint = db.data.sprints.find((s: RawSprint) => s.id === sprintId);
     if (!sprint || !sprint.todoTasks) return [];
     
@@ -13,11 +14,13 @@ export class LowDbTodoTaskRepository implements TodoTaskRepository {
 
   async findAllUnassigned(): Promise<TodoTask[]> {
     const db = await getDb();
+    await db.read();
     return db.data.todoTasks.map((t: RawTodoTask) => this.toEntity(t));
   }
 
   async findById(id: string): Promise<TodoTask | null> {
     const db = await getDb();
+    await db.read();
     
     // 1. 未割当から探す
     let found = db.data.todoTasks.find((t: RawTodoTask) => t.id === id);
@@ -37,6 +40,7 @@ export class LowDbTodoTaskRepository implements TodoTaskRepository {
   async save(item: TodoTask): Promise<void> {
     console.log(`Saving TodoTask: ${item.title} (id: ${item.id}, sprintId: ${item.sprintId})`);
     const db = await getDb();
+    await db.read();
     const data = this.toRaw(item);
 
     let saved = false;

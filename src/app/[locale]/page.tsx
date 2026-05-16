@@ -5,9 +5,8 @@ import { LowDbTodoTaskRepository } from "@/infrastructure/repositories/LowDbTodo
 import { LowDbCapacityRepository } from "@/infrastructure/repositories/LowDbCapacityRepository";
 import { LowDbBurnDownSnapshotRepository } from "@/infrastructure/repositories/LowDbBurnDownSnapshotRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
-import BurnDownChart, {
-  ChartData,
-} from "@/app/[locale]/components/BurnDownChart";
+import BurnDownChart from "@/app/[locale]/components/BurnDownChart";
+import { generateBurnDownChartData } from "@/app/[locale]/components/chartUtils";
 import Image from "next/image";
 import { PomodoroProvider } from "./sprints/[id]/PomodoroContext";
 import PomodoroStatusDisplay from "./sprints/[id]/PomodoroStatusDisplay";
@@ -79,88 +78,17 @@ export default async function DashboardPage() {
   const capacities = await sprintUseCase.getCapacities(activeSprint.id);
   const snapshots = await sprintUseCase.getSnapshots(activeSprint.id);
   const velocity = await sprintUseCase.calculateVelocity(activeSprint.id);
-
-  // 日付フォーマット関数 (MM/DD)
-  const formatDate = (date: Date) => {
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
-    const d = date.getDate().toString().padStart(2, "0");
-    return `${m}/${d}`;
-  };
-
-  // 総予定Pulse
-  const totalPulse = capacities.reduce((sum, c) => sum + c.pulseCount, 0);
-
-  // キャパシティマップ（日付文字列 → パルス数）
-  const capacityMap: { [key: string]: number } = {};
-  capacities.forEach((c) => {
-    const dateStr = formatDate(new Date(c.date));
-    capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
-  });
-
-  // スナップショットマップ（日付文字列 → 残りPulse）
-  const snapshotMap: { [key: string]: number } = {};
-  snapshots.forEach((s) => {
-    const dateStr = formatDate(new Date(s.date));
-    snapshotMap[dateStr] = s.remainingPulse;
-  });
-
-  // 総キャパシティを計算
-  let totalCapacity = 0;
-  Object.values(capacityMap).forEach((v) => (totalCapacity += v));
+  const { totalEstPulse, plannedActualPulse } = await sprintUseCase.getSprintPulseStats(activeSprint.id);
 
   // チャートデータ生成
-  const chartData: ChartData[] = [];
-  let usedCapacity = 0;
-  const currentDate = new Date(activeSprint.startDate);
-  const endDate = new Date(activeSprint.endDate);
-
-  // 現在の残り作業量を取得
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayStr = formatDate(today);
-  let idealStarted = false;
-  let remainingWork = totalPulse;
-
-  while (currentDate <= endDate) {
-    const dateStr = formatDate(currentDate);
-    const dayCapacity = capacityMap[dateStr] || 0;
-    const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
-
-    // 理想線：今日から開始し、明日以降のキャパシティ通りに消化した場合を計算
-    let idealValue = null;
-    if (!idealStarted && dateStr >= todayStr) {
-      idealStarted = true;
-      // 現在の残り作業量を設定（最新のスナップショットがあればそれを使う）
-      const latestSnapshot = [...snapshots].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      )[0];
-      remainingWork = latestSnapshot
-        ? latestSnapshot.remainingPulse
-        : totalPulse;
-      idealValue = remainingWork; // 今日の時点での残り作業量を表示
-    }
-
-    if (idealStarted && dateStr > todayStr) {
-      // 明日以降：実際のキャパシティ通りに減算（整数）
-      const dailyDecrease = Math.min(dayCapacity, remainingWork);
-      remainingWork = Math.max(0, remainingWork - dailyDecrease);
-      idealValue = remainingWork;
-    }
-
-    const actual =
-      snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
-
-    chartData.push({
-      date: dateStr,
-      ideal: idealValue,
-      actual: actual,
-      capacity: remainingCapacity,
-      velocity: dateStr <= todayStr ? velocity : null,
-    });
-
-    usedCapacity += dayCapacity;
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
+  const chartData = generateBurnDownChartData({
+    sprint: activeSprint,
+    capacities,
+    snapshots,
+    totalEstPulse,
+    plannedActualPulse,
+    velocity,
+  });
 
   return (
     <PomodoroProvider>

@@ -217,7 +217,7 @@
               "id": "Vr1h4ypysNHX2QBP1r42-",
               "backlogItemId": "6kUPAOOsfuDwYOcBRX0yy",
               "title": "アニメーションを追加する",
-              "status": "todo",
+              "status": "pooled",
               "estimatedPulse": 4,
               "actualPulse": 0,
               "createdAt": "2026-05-01T07:07:04.000Z",
@@ -339,7 +339,7 @@
               "title": "ベロシティを計算する",
               "status": "done",
               "estimatedPulse": 1,
-              "actualPulse": 0,
+              "actualPulse": 1,
               "createdAt": "2026-05-12T13:04:25.000Z",
               "updatedAt": "2026-05-12T13:04:32.000Z"
             },
@@ -349,7 +349,7 @@
               "title": "Dockerで両方とも(本体、MCP)サーバーが動くようにしたい",
               "status": "done",
               "estimatedPulse": 1,
-              "actualPulse": 0,
+              "actualPulse": 1,
               "createdAt": "2026-05-14T13:46:21.475Z",
               "updatedAt": "2026-05-14T13:46:21.475Z"
             }
@@ -475,8 +475,127 @@
           "id": "pYA30nWbcoY2S2K5RDZDm",
           "sprintId": "Udy073spx42fxOX_hCbOi",
           "date": "2026-05-16T00:00:00.000Z",
-          "remainingPulse": 4,
-          "createdAt": "2026-05-16T04:41:07.040Z"
+          "remainingPulse": 0,
+          "createdAt": "2026-05-16T23:55:22.045Z"
+        }
+      ]
+    },
+    {
+      "id": "gvAZAh8MrhDNOtNwsa8lx",
+      "name": "色々プロジェクト改修",
+      "goal": "旧プロジェクトをリプレースしてMCP対応にする等アップデートを進める期間とする",
+      "startDate": "2026-05-18T00:00:00.000Z",
+      "endDate": "2026-05-24T00:00:00.000Z",
+      "status": "planning",
+      "retrospective": null,
+      "createdAt": "2026-05-16T22:55:17.289Z",
+      "updatedAt": "2026-05-16T22:55:17.289Z",
+      "todoTasks": [],
+      "backlogItems": [
+        {
+          "id": "3E4x_7pLYh27Rgq3tm1SA",
+          "subject": "私",
+          "title": "Workdaysを改修したい",
+          "why": "生成AIと連携させることでさらに便利になるからだ",
+          "description": "MCPと連携させたい",
+          "acceptanceCriteria": "- MCP で現状についてコメントしてもらえること\r\n- MCP で休む日を提案してもらえること",
+          "storyPoints": 2,
+          "status": "backlog",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "priority": 0,
+          "createdAt": "2026-05-09T13:25:38.000Z",
+          "updatedAt": "2026-05-09T13:25:38.000Z",
+          "tasks": []
+        },
+        {
+          "id": "FFIxsR4LXRnYViAYQFqZD",
+          "subject": "私",
+          "title": "ExpenditureBookを改修したい",
+          "why": "生成AIと連携させることでさらに便利になるからだ",
+          "description": "MCPと連携させたい",
+          "acceptanceCriteria": "- MCP で各月の現状についてコメントしてもらえること\r\n- MCP で過去の支払いから支出を予想してもらえること\r\n- 外部からデータをインポートできること",
+          "storyPoints": 3,
+          "status": "backlog",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "priority": 0,
+          "createdAt": "2026-05-09T13:27:18.000Z",
+          "updatedAt": "2026-05-09T13:56:14.000Z",
+          "tasks": []
+        },
+        {
+          "id": "mkutOKxrEITbMJQqxsioJ",
+          "subject": "私",
+          "title": "Back of Flyer Memoを改修したい",
+          "why": "入力を簡単にしたいからだ",
+          "description": "- Expenditure Book と連携させたい\r\n- ドキュメントDBを使いたい",
+          "acceptanceCriteria": "- バージョンアップを気軽にできること",
+          "storyPoints": 2,
+          "status": "backlog",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "priority": 0,
+          "createdAt": "2026-05-10T14:30:42.000Z",
+          "updatedAt": "2026-05-10T14:30:42.000Z",
+          "tasks": []
+        }
+      ],
+      "capacities": [
+        {
+          "id": "HiIFZMvGsuXuMOg22D8dV",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-18T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "2qviK3-aIEXSAUYesgJk6",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-19T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "lfVfbElT6SYdubp0P6iYP",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-20T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "xjUEHGqFwosCmMIUpPBcT",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-21T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "YNkFuPQskuEoheaMKD8uy",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-22T00:00:00.000Z",
+          "pulseCount": 4,
+          "note": null
+        },
+        {
+          "id": "mcp7_Uf6QYgcRJWjBrcoF",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-23T00:00:00.000Z",
+          "pulseCount": 2,
+          "note": null
+        },
+        {
+          "id": "-hjDes8xnkTL3lKzR-RDv",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-24T00:00:00.000Z",
+          "pulseCount": 0,
+          "note": "レトロプランニング"
+        }
+      ],
+      "snapshots": [
+        {
+          "id": "rbym3HXhBEdbc4Aynji2a",
+          "sprintId": "gvAZAh8MrhDNOtNwsa8lx",
+          "date": "2026-05-16T00:00:00.000Z",
+          "remainingPulse": 0,
+          "createdAt": "2026-05-16T22:58:05.686Z"
         }
       ]
     }
@@ -495,51 +614,5 @@
       "updatedAt": "2026-05-01T11:05:42.000Z"
     }
   ],
-  "backlogItems": [
-    {
-      "id": "3E4x_7pLYh27Rgq3tm1SA",
-      "subject": "私",
-      "title": "Workdaysを改修したい",
-      "why": "生成AIと連携させることでさらに便利になるからだ",
-      "description": "MCPと連携させたい",
-      "acceptanceCriteria": "- MCP で現状についてコメントしてもらえること\r\n- MCP で休む日を提案してもらえること",
-      "storyPoints": 2,
-      "status": "backlog",
-      "sprintId": null,
-      "priority": 0,
-      "createdAt": "2026-05-09T13:25:38.000Z",
-      "updatedAt": "2026-05-09T13:25:38.000Z",
-      "tasks": []
-    },
-    {
-      "id": "FFIxsR4LXRnYViAYQFqZD",
-      "subject": "私",
-      "title": "ExpenditureBookを改修したい",
-      "why": "生成AIと連携させることでさらに便利になるからだ",
-      "description": "MCPと連携させたい",
-      "acceptanceCriteria": "- MCP で各月の現状についてコメントしてもらえること\r\n- MCP で過去の支払いから支出を予想してもらえること\r\n- 外部からデータをインポートできること",
-      "storyPoints": 3,
-      "status": "backlog",
-      "sprintId": null,
-      "priority": 0,
-      "createdAt": "2026-05-09T13:27:18.000Z",
-      "updatedAt": "2026-05-09T13:56:14.000Z",
-      "tasks": []
-    },
-    {
-      "id": "mkutOKxrEITbMJQqxsioJ",
-      "subject": "私",
-      "title": "Back of Flyer Memoを改修したい",
-      "why": "入力を簡単にしたいからだ",
-      "description": "- Expenditure Book と連携させたい\r\n- ドキュメントDBを使いたい",
-      "acceptanceCriteria": "- バージョンアップを気軽にできること",
-      "storyPoints": 2,
-      "status": "backlog",
-      "sprintId": null,
-      "priority": 0,
-      "createdAt": "2026-05-10T14:30:42.000Z",
-      "updatedAt": "2026-05-10T14:30:42.000Z",
-      "tasks": []
-    }
-  ]
+  "backlogItems": []
 }

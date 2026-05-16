@@ -28,6 +28,7 @@ import Link from "next/link";
 import BurnDownChart, {
   ChartData,
 } from "@/app/[locale]/components/BurnDownChart";
+import { addCalendarDays, formatDate } from "@/app/[locale]/components/chartUtils";
 import PomodoroTimer from "./PomodoroTimer";
 import { PomodoroProvider, usePomodoro } from "./PomodoroContext";
 import { TaskStatus } from "@/domain/entities/Task";
@@ -70,6 +71,12 @@ interface PlanningBoardProps {
   todoTasks: TodoTask[];
   unassignedTodoTasks: TodoTask[];
   velocity: number;
+  pulseStats: {
+    totalEstPulse: number;
+    plannedActualPulse: number;
+    totalActualPulse: number;
+  };
+  chartData: ChartData[];
 }
 
 export default function PlanningBoard({
@@ -81,6 +88,8 @@ export default function PlanningBoard({
   todoTasks,
   unassignedTodoTasks,
   velocity,
+  pulseStats,
+  chartData,
 }: PlanningBoardProps) {
   return (
     <PomodoroProvider>
@@ -93,6 +102,8 @@ export default function PlanningBoard({
         todoTasks={todoTasks}
         unassignedTodoTasks={unassignedTodoTasks}
         velocity={velocity}
+        pulseStats={pulseStats}
+        chartData={chartData}
       />
     </PomodoroProvider>
   );
@@ -107,6 +118,8 @@ function PlanningBoardInner({
   todoTasks,
   unassignedTodoTasks,
   velocity,
+  pulseStats,
+  chartData,
 }: PlanningBoardProps) {
   const { startPomodoro } = usePomodoro();
   const t = useTranslations("sprints");
@@ -184,73 +197,14 @@ function PlanningBoardInner({
     (sum, item) => sum + (item.storyPoints ?? 0),
     0,
   );
-  // 使用されていない警告が出るが、将来的なロジックで必要になる可能性があるため
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _unused = { totalCapacity, totalPoints };
 
   // スプリント全体の合計実績Pulseと見積Pulse (PBIタスク + Todoタスク)
-  // 総予定: pooled除く全タスクの見積もり合計
-  const pbiTotalEst = sprintItems.reduce(
-    (sum, item) =>
-      sum +
-      item.tasks.reduce(
-        (tSum: number, t: TaskWithStatus) =>
-          t.status !== "pooled" ? tSum + t.estimatedPulse : tSum,
-        0,
-      ),
-    0,
-  );
-  const todoTotalEst = todoTasks.reduce(
-    (sum, t) => (t.status !== "pooled" ? sum + t.estimatedPulse : sum),
-    0,
-  );
-  const totalEstPulse = pbiTotalEst + todoTotalEst; // 総予定Pulse
-
-  // 予定実績: doneタスクの見積もり合計
-  const pbiPlannedActual = sprintItems.reduce(
-    (sum, item) =>
-      sum +
-      item.tasks.reduce(
-        (tSum: number, t: TaskWithStatus) =>
-          t.status === "done" ? tSum + t.estimatedPulse : tSum,
-        0,
-      ),
-    0,
-  );
-  const todoPlannedActual = todoTasks.reduce(
-    (sum, t) => (t.status === "done" ? sum + t.estimatedPulse : sum),
-    0,
-  );
-  const plannedActualPulse = pbiPlannedActual + todoPlannedActual;
-
-  // 実際実績: pooled除く全タスクの実績合計
-  const pbiActual = sprintItems.reduce(
-    (sum, item) =>
-      sum +
-      item.tasks.reduce(
-        (tSum: number, t: TaskWithStatus) =>
-          t.status !== "pooled" ? tSum + t.actualPulse : tSum,
-        0,
-      ),
-    0,
-  );
-  const todoActual = todoTasks.reduce(
-    (sum, t) => (t.status !== "pooled" ? sum + t.actualPulse : sum),
-    0,
-  );
-  const totalActualPulse = pbiActual + todoActual;
-
-  // 日付フォーマット関数 (MM/DD)
-  const formatDate = (date: Date) => {
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
-    const d = date.getDate().toString().padStart(2, "0");
-    return `${m}/${d}`;
-  };
+  const { totalEstPulse, plannedActualPulse, totalActualPulse } = pulseStats;
 
   // キャパシティマップ（日付文字列 → パルス数）
   const capacityMap: { [key: string]: number } = {};
   initialCapacities.forEach((c: Capacity) => {
-    const dateStr = formatDate(new Date(c.date));
+    const dateStr = formatDate(c.date);
     capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
   });
 
@@ -275,103 +229,11 @@ function PlanningBoardInner({
   // 警告判定：残り見積が明日以降のキャパシティを超えているか
   const isOverCapacity = remainingEstPulse > remainingCapacityFromTomorrow;
 
-  // バーンダウンチャート用データ生成
-  const generateChartData = () => {
-    const chartStartDate = new Date(sprint.startDate);
-    const chartEndDate = new Date(sprint.endDate);
-    const chartData: ChartData[] = [];
-
-    // 総予定Pulse: スナップショットの最初の値に予定実績を足すか、現在の総予定Pulse
-    let totalPulse;
-    if (snapshots && snapshots.length > 0) {
-      const sortedSnapshots = [...snapshots].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-      );
-      // スナップショットの最初の残りPulse + その時点の予定実績（完了分）
-      totalPulse = sortedSnapshots[0].remainingPulse + plannedActualPulse;
-    } else {
-      totalPulse = totalEstPulse;
-    }
-
-    // 総キャパシティを計算
-    let totalCapacity = 0;
-    Object.values(capacityMap).forEach((v) => (totalCapacity += v));
-
-    // 日ごとの理想残りPulseと実績残りPulse
-    let usedCapacity = 0;
-    const currentDate = new Date(chartStartDate);
-    const snapshotMap: { [key: string]: number } = {};
-    (snapshots || []).forEach((s: BurnDownSnapshot) => {
-      const dateStr = formatDate(new Date(s.date));
-      snapshotMap[dateStr] = s.remainingPulse;
-    });
-
-    // 現在の残り作業量を取得（最新のスナップショットまたは総予定）
-    const todayInChart = new Date();
-    todayInChart.setHours(0, 0, 0, 0);
-    const todayStr = formatDate(todayInChart);
-    // 現在日から理想線を開始するための準備
-    let idealStarted = false;
-    let remainingWork = totalPulse; // 現在の残り作業量
-
-    // 残り工作日数の計算は不要（実際のキャパシティ通りに消化するため）
-
-    while (currentDate <= chartEndDate) {
-      const dateStr = formatDate(currentDate);
-      const dayCapacity = capacityMap[dateStr] || 0;
-      const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
-
-      // 理想線：今日から開始し、明日以降のキャパシティ通りに消化した場合を計算
-      let idealValue: number | null = null;
-      if (!idealStarted && dateStr >= todayStr) {
-        // 今日以降：理想線を開始
-        idealStarted = true;
-        // 現在の残り作業量を設定（最新のスナップショットがあればそれを使う）
-        const latestSnapshot = [...(snapshots || [])].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        )[0];
-        remainingWork = latestSnapshot
-          ? latestSnapshot.remainingPulse
-          : totalPulse;
-        idealValue = remainingWork; // 今日の時点での残り作業量を表示
-      }
-
-      if (idealStarted && dateStr > todayStr) {
-        // 明日以降：実際のキャパシティ通りに減算（整数）
-        const dailyDecrease = Math.min(dayCapacity, remainingWork);
-        remainingWork = Math.max(0, remainingWork - dailyDecrease);
-        idealValue = remainingWork;
-      }
-
-      const actual =
-        snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
-
-      chartData.push({
-        date: dateStr,
-        ideal: idealValue,
-        actual: actual,
-        capacity: remainingCapacity,
-        velocity: dateStr <= todayStr ? velocity : null,
-      });
-
-      usedCapacity += dayCapacity;
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    return { chartData, totalPulse };
-  };
-
-  const { chartData } = generateChartData();
-
   // 今日の進捗遅延をチェック（前日のスナップショットと比較）
-  const todayCheck = new Date();
-  todayCheck.setHours(0, 0, 0, 0);
-  const todayStrCheck = formatDate(todayCheck);
+  const todayStrCheck = formatDate(new Date());
   const todayEntry = chartData.find((d) => d.date === todayStrCheck);
 
-  const yesterday = new Date(todayCheck);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = formatDate(yesterday);
+  const yesterdayStr = formatDate(addCalendarDays(new Date(), -1));
   const yesterdayEntry = chartData.find((d) => d.date === yesterdayStr);
 
   let isTodayBehind = false;

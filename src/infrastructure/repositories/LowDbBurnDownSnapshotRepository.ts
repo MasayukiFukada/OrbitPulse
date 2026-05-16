@@ -5,6 +5,7 @@ import { getDb, RawSprint, RawSnapshot } from "../db/json-db";
 export class LowDbBurnDownSnapshotRepository implements BurnDownSnapshotRepository {
   async findBySprintId(sprintId: string): Promise<BurnDownSnapshot[]> {
     const db = await getDb();
+    await db.read();
     const sprint = db.data.sprints.find((s: RawSprint) => s.id === sprintId);
     if (!sprint || !sprint.snapshots) return [];
     
@@ -35,6 +36,7 @@ export class LowDbBurnDownSnapshotRepository implements BurnDownSnapshotReposito
 
   async save(snapshot: BurnDownSnapshot): Promise<void> {
     const db = await getDb();
+    await db.read();
     const sprintIndex = db.data.sprints.findIndex((s: RawSprint) => s.id === snapshot.sprintId);
     if (sprintIndex === -1) return;
 

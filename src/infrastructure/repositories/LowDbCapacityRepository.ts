@@ -5,6 +5,7 @@ import { getDb, RawSprint, RawCapacity } from "../db/json-db";
 export class LowDbCapacityRepository implements CapacityRepository {
   async findBySprintId(sprintId: string): Promise<Capacity[]> {
     const db = await getDb();
+    await db.read();
     const sprint = db.data.sprints.find((s: RawSprint) => s.id === sprintId);
     if (!sprint || !sprint.capacities) return [];
     
@@ -14,6 +15,7 @@ export class LowDbCapacityRepository implements CapacityRepository {
   async saveAll(items: Capacity[]): Promise<void> {
     if (items.length === 0) return;
     const db = await getDb();
+    await db.read();
     
     // 全てのアイテムに対して処理を行う
     for (const item of items) {

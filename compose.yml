@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "4105:3000"
     volumes:
       - ./data:/app/data
     environment:
       - DB_PATH=/app/data/db.json
-    restart: always
+

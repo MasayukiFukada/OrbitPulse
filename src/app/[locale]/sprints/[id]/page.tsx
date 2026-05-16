@@ -9,6 +9,7 @@ import { ManageBacklogUseCase } from "@/application/use-cases/ManageBacklogUseCa
 import { ManageTaskUseCase } from "@/application/use-cases/ManageTaskUseCase";
 import { ManageTodoUseCase } from "@/application/use-cases/ManageTodoUseCase";
 import PlanningBoard from "./PlanningBoard";
+import { generateBurnDownChartData } from "@/app/[locale]/components/chartUtils";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 
@@ -55,6 +56,16 @@ export default async function SprintDetailPage({
   const allBacklogItems = await backlogUseCase.getBacklogItems();
   const todoTasks = await todoUseCase.getSprintTodoTasks(id);
   const unassignedTodoTasks = await todoUseCase.getUnassignedTodoTasks();
+  const pulseStats = await sprintUseCase.getSprintPulseStats(id);
+
+  const chartData = generateBurnDownChartData({
+    sprint,
+    capacities,
+    snapshots,
+    totalEstPulse: pulseStats.totalEstPulse,
+    plannedActualPulse: pulseStats.plannedActualPulse,
+    velocity,
+  });
 
   // 各アイテムのタスクを取得
   const sprintItemsWithTasks = await Promise.all(
@@ -150,6 +161,8 @@ export default async function SprintDetailPage({
       todoTasks={plainTodoTasks as never}
       unassignedTodoTasks={plainUnassignedTodoTasks as never}
       velocity={velocity}
+      pulseStats={pulseStats}
+      chartData={chartData}
     />
   );
 }
