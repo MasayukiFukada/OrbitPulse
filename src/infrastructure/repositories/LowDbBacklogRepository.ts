@@ -57,12 +57,24 @@ export class LowDbBacklogRepository implements BacklogRepository {
         const items = db.data.sprints[sprintIndex].backlogItems;
         const index = items.findIndex((i: RawBacklogItem) => i.id === item.id);
         
+        let existingTasks: RawTask[] = [];
         if (index !== -1) {
-          // 既存タスクを保持しつつ更新
-          const existingTasks = items[index].tasks || [];
+          existingTasks = items[index].tasks || [];
+        } else {
+          // 他の場所（未割当または他スプリント）から既存タスクを探す
+          const foundItem = await this.findById(item.id);
+          if (foundItem) {
+            // findById は Entity を返すが、タスク情報は DB から直接取得する必要がある
+            const allItems = await this.findAllWithTasks();
+            const original = allItems.find(i => i.id === item.id);
+            if (original) existingTasks = original.tasks || [];
+          }
+        }
+        
+        if (index !== -1) {
           items[index] = { ...raw, tasks: existingTasks };
         } else {
-          items.push({ ...raw, tasks: [] });
+          items.push({ ...raw, tasks: existingTasks });
         }
 
         // 未割当リストや他のスプリントから削除
@@ -77,12 +89,21 @@ export class LowDbBacklogRepository implements BacklogRepository {
       // 未割当として保存
       if (!db.data.backlogItems) db.data.backlogItems = [];
       const index = db.data.backlogItems.findIndex((i: RawBacklogItem) => i.id === item.id);
+      
+      let existingTasks: RawTask[] = [];
       if (index !== -1) {
-        // 既存タスクを保持しつつ更新
-        const existingTasks = db.data.backlogItems[index].tasks || [];
+        existingTasks = db.data.backlogItems[index].tasks || [];
+      } else {
+        // スプリントから既存タスクを探す
+        const allItems = await this.findAllWithTasks();
+        const original = allItems.find(i => i.id === item.id);
+        if (original) existingTasks = original.tasks || [];
+      }
+
+      if (index !== -1) {
         db.data.backlogItems[index] = { ...raw, tasks: existingTasks };
       } else {
-        db.data.backlogItems.push({ ...raw, tasks: [] });
+        db.data.backlogItems.push({ ...raw, tasks: existingTasks });
       }
 
       // 全スプリントから削除
@@ -94,6 +115,18 @@ export class LowDbBacklogRepository implements BacklogRepository {
     }
 
     await db.write();
+  }
+
+  // タスクを含む生のデータを取得する内部メソッド
+  private async findAllWithTasks(): Promise<RawBacklogItem[]> {
+    const db = await getDb();
+    await db.read();
+    const items: RawBacklogItem[] = [];
+    if (db.data.backlogItems) items.push(...db.data.backlogItems);
+    db.data.sprints.forEach(s => {
+      if (s.backlogItems) items.push(...s.backlogItems);
+    });
+    return items;
   }
 
   async delete(id: string): Promise<void> {

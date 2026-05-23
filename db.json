@@ -471,7 +471,28 @@
       "priority": 0,
       "createdAt": "2026-05-09T13:25:38.000Z",
       "updatedAt": "2026-05-09T13:25:38.000Z",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "RhDa2174reN3gWH5yQtjg",
+          "backlogItemId": "3E4x_7pLYh27Rgq3tm1SA",
+          "title": "MCP対応を確認",
+          "status": "done",
+          "estimatedPulse": 1,
+          "actualPulse": 1,
+          "createdAt": "2026-05-17T12:25:55.800Z",
+          "updatedAt": "2026-05-17T12:25:55.800Z"
+        },
+        {
+          "id": "z4tvLc3IGd1NW9T_Az6wF",
+          "backlogItemId": "3E4x_7pLYh27Rgq3tm1SA",
+          "title": "Dockerを置き換え",
+          "status": "done",
+          "estimatedPulse": 2,
+          "actualPulse": 4,
+          "createdAt": "2026-05-17T12:53:11.540Z",
+          "updatedAt": "2026-05-17T12:53:11.540Z"
+        }
+      ]
     },
     {
       "id": "FFIxsR4LXRnYViAYQFqZD",
@@ -486,7 +507,28 @@
       "priority": 0,
       "createdAt": "2026-05-09T13:27:18.000Z",
       "updatedAt": "2026-05-09T13:56:14.000Z",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "KrSBa6pknPEYaoerudG7n",
+          "backlogItemId": "FFIxsR4LXRnYViAYQFqZD",
+          "title": "MCP対応を確認",
+          "status": "done",
+          "estimatedPulse": 4,
+          "actualPulse": 2,
+          "createdAt": "2026-05-17T12:26:12.335Z",
+          "updatedAt": "2026-05-17T12:26:12.335Z"
+        },
+        {
+          "id": "tmYl6NBzW9CvMa3iy0Fai",
+          "backlogItemId": "FFIxsR4LXRnYViAYQFqZD",
+          "title": "Dockerを置き換え",
+          "status": "done",
+          "estimatedPulse": 2,
+          "actualPulse": 1,
+          "createdAt": "2026-05-17T12:53:22.971Z",
+          "updatedAt": "2026-05-17T12:53:22.971Z"
+        }
+      ]
     },
     {
       "id": "mkutOKxrEITbMJQqxsioJ",
@@ -501,7 +543,18 @@
       "priority": 0,
       "createdAt": "2026-05-10T14:30:42.000Z",
       "updatedAt": "2026-05-10T14:30:42.000Z",
-      "tasks": []
+      "tasks": [
+        {
+          "id": "sNMDZSX7-omN4Y4iyOrtC",
+          "backlogItemId": "mkutOKxrEITbMJQqxsioJ",
+          "title": "数値の加算・減算機能を追加する",
+          "status": "pooled",
+          "estimatedPulse": 1,
+          "actualPulse": 0,
+          "createdAt": "2026-05-17T12:26:54.025Z",
+          "updatedAt": "2026-05-17T12:26:54.025Z"
+        }
+      ]
     }
   ]
 }
