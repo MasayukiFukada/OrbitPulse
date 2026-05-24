@@ -1,6 +1,6 @@
 import { BacklogRepository } from "@/domain/repositories/BacklogRepository";
 import { BacklogItem, BacklogItemStatus } from "@/domain/entities/BacklogItem";
-import { getDb, RawSprint, RawBacklogItem } from "../db/json-db";
+import { getDb, RawSprint, RawBacklogItem, RawTask } from "../db/json-db";
 
 export class LowDbBacklogRepository implements BacklogRepository {
   async findAll(): Promise<BacklogItem[]> {
