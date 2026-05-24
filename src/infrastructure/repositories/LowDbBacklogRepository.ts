@@ -48,6 +48,25 @@ export class LowDbBacklogRepository implements BacklogRepository {
     await db.read();
     const raw = this.toRaw(item);
 
+    // 全アイテムの中から既存のタスク情報を探す (db.data を直接参照して db.read() を避ける)
+    const findExistingTasks = (): RawTask[] => {
+      // 未割当から探す
+      if (db.data.backlogItems) {
+        const found = db.data.backlogItems.find((i: RawBacklogItem) => i.id === item.id);
+        if (found && found.tasks) return found.tasks;
+      }
+      // スプリント内から探す
+      for (const s of db.data.sprints) {
+        if (s.backlogItems) {
+          const found = s.backlogItems.find((i: RawBacklogItem) => i.id === item.id);
+          if (found && found.tasks) return found.tasks;
+        }
+      }
+      return [];
+    };
+
+    const existingTasks = findExistingTasks();
+
     if (item.sprintId) {
       const sprintIndex = db.data.sprints.findIndex((s: RawSprint) => s.id === item.sprintId);
       if (sprintIndex !== -1) {
@@ -56,20 +75,6 @@ export class LowDbBacklogRepository implements BacklogRepository {
         }
         const items = db.data.sprints[sprintIndex].backlogItems;
         const index = items.findIndex((i: RawBacklogItem) => i.id === item.id);
-        
-        let existingTasks: RawTask[] = [];
-        if (index !== -1) {
-          existingTasks = items[index].tasks || [];
-        } else {
-          // 他の場所（未割当または他スプリント）から既存タスクを探す
-          const foundItem = await this.findById(item.id);
-          if (foundItem) {
-            // findById は Entity を返すが、タスク情報は DB から直接取得する必要がある
-            const allItems = await this.findAllWithTasks();
-            const original = allItems.find(i => i.id === item.id);
-            if (original) existingTasks = original.tasks || [];
-          }
-        }
         
         if (index !== -1) {
           items[index] = { ...raw, tasks: existingTasks };
@@ -90,16 +95,6 @@ export class LowDbBacklogRepository implements BacklogRepository {
       if (!db.data.backlogItems) db.data.backlogItems = [];
       const index = db.data.backlogItems.findIndex((i: RawBacklogItem) => i.id === item.id);
       
-      let existingTasks: RawTask[] = [];
-      if (index !== -1) {
-        existingTasks = db.data.backlogItems[index].tasks || [];
-      } else {
-        // スプリントから既存タスクを探す
-        const allItems = await this.findAllWithTasks();
-        const original = allItems.find(i => i.id === item.id);
-        if (original) existingTasks = original.tasks || [];
-      }
-
       if (index !== -1) {
         db.data.backlogItems[index] = { ...raw, tasks: existingTasks };
       } else {
