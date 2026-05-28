@@ -22,12 +22,19 @@ interface BacklogListProps {
 }
 
 export default function BacklogList({ initialItems }: BacklogListProps) {
-  const [editingItem, setEditingItem] = useState<BacklogItemWithStats | null>(null);
-  const [itemStates, setItemStates] = useState<Record<string, { isCollapsed: boolean }>>(
-    initialItems.reduce((acc, item) => ({ 
-      ...acc, 
-      [item.id]: { isCollapsed: true } 
-    }), {})
+  const [editingItem, setEditingItem] = useState<BacklogItemWithStats | null>(
+    null,
+  );
+  const [itemStates, setItemStates] = useState<
+    Record<string, { isCollapsed: boolean }>
+  >(
+    initialItems.reduce(
+      (acc, item) => ({
+        ...acc,
+        [item.id]: { isCollapsed: true },
+      }),
+      {},
+    ),
   );
   const t = useTranslations("backlog");
   const tc = useTranslations("common");
@@ -37,7 +44,7 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
       const current = prev[id] || { isCollapsed: true };
       return {
         ...prev,
-        [id]: { isCollapsed: !current.isCollapsed }
+        [id]: { isCollapsed: !current.isCollapsed },
       };
     });
   };
@@ -55,12 +62,15 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
           ) : (
             initialItems.map((item) => {
               const state = itemStates[item.id] || { isCollapsed: true };
-              
+
               return (
-                <div key={item.id} className={`${styles.card} ${state.isCollapsed ? styles.collapsed : ""}`}>
+                <div
+                  key={item.id}
+                  className={`${styles.card} ${state.isCollapsed ? styles.collapsed : ""}`}
+                >
                   <div className={styles.cardHeader}>
                     <div className={styles.headerTitleGroup}>
-                      <button 
+                      <button
                         onClick={() => toggleCollapse(item.id)}
                         className={styles.toggleBtn}
                         title="Toggle collapse"
@@ -68,10 +78,25 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
                         {state.isCollapsed ? "▶" : "▼"}
                       </button>
                       <h2 className={styles.itemTitle}>
-                        {item.subject}{t("subjectTitleSeparator")}{item.title}
+                        {item.subject}
+                        {t("subjectTitleSeparator")}
+                        {item.title}
                       </h2>
+
+                      {item.taskStats &&
+                        item.taskStats.total > 0 &&
+                        item.taskStats.done === item.taskStats.total && (
+                          <span
+                            className={styles.completedBadge}
+                            title={t("completedBadge")}
+                          >
+                            ✓ {t("completedBadge")}
+                          </span>
+                        )}
                     </div>
-                    <span className={styles.points}>{item.storyPoints} pts</span>
+                    <span className={styles.points}>
+                      {item.storyPoints} pts
+                    </span>
                   </div>
 
                   {!state.isCollapsed && (
@@ -83,7 +108,9 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
                       {item.description && (
                         <div className={styles.details}>
                           <strong>{t("descriptionLabel")}</strong>
-                          <p className={styles.description}>{item.description}</p>
+                          <p className={styles.description}>
+                            {item.description}
+                          </p>
                         </div>
                       )}
 
@@ -127,7 +154,9 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
                         >
                           {tc("edit")}
                         </button>
-                        <form action={deleteBacklogItemAction.bind(null, item.id)}>
+                        <form
+                          action={deleteBacklogItemAction.bind(null, item.id)}
+                        >
                           <button type="submit" className={styles.deleteButton}>
                             {tc("delete")}
                           </button>
@@ -140,7 +169,6 @@ export default function BacklogList({ initialItems }: BacklogListProps) {
             })
           )}
         </section>
-
 
         <section className={styles.formSection}>
           <BacklogForm

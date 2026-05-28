@@ -36,7 +36,8 @@
     "pooled": "Pooled",
     "todo": "Todo",
     "doing": "Doing",
-    "total": "Total"
+    "total": "Total",
+    "completedBadge": "Completed"
   },
   "sprints": {
     "title": "Sprints",

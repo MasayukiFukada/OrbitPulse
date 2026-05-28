@@ -36,7 +36,8 @@
     "pooled": "プール",
     "todo": "未着手",
     "doing": "進行中",
-    "total": "合計"
+    "total": "合計",
+    "completedBadge": "完了"
   },
   "sprints": {
     "title": "スプリント",
