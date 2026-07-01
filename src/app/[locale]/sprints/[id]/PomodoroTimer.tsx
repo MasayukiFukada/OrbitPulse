@@ -6,13 +6,11 @@ import styles from "./PomodoroTimer.module.css";
 import { usePomodoro } from "./PomodoroContext";
 
 interface PomodoroTimerProps {
-  onComplete: (taskId: string, isTodoTask: boolean) => Promise<void>;
   defaultWorkMinutes?: number;
   defaultBreakMinutes?: number;
 }
 
 export default function PomodoroTimer({
-  onComplete,
   defaultWorkMinutes = 25,
   defaultBreakMinutes = 5,
 }: PomodoroTimerProps) {
@@ -30,9 +28,7 @@ export default function PomodoroTimer({
     if (state.status === "work") {
       sendNotification(t('workEndedTitle'), t('workEndedBody', { workMinutes: defaultWorkMinutes, breakMinutes: defaultBreakMinutes }));
       startBreak(defaultBreakMinutes);
-      if (state.taskId) {
-        await onComplete(state.taskId, state.isTodoTask);
-      }
+      // 実績の更新はグローバルの GlobalPomodoroListener で行う
     } else if (state.status === "break") {
       sendNotification(t('breakEndedTitle'), t('breakEndedBody'));
       stopPomodoro();

@@ -1,45 +1,18 @@
-import { Sprint, SprintStatus } from "@/domain/entities/Sprint";
-import { Capacity } from "@/domain/entities/Capacity";
+import { Sprint, SprintStatus, SprintDay } from "@/domain/entities/Sprint";
 import { SprintRepository } from "@/domain/repositories/SprintRepository";
-import { CapacityRepository } from "@/domain/repositories/CapacityRepository";
 import { BacklogRepository } from "@/domain/repositories/BacklogRepository";
-import { BurnDownSnapshotRepository } from "@/domain/repositories/BurnDownSnapshotRepository";
 import { TaskRepository } from "@/domain/repositories/TaskRepository";
-import { TodoTaskRepository } from "@/domain/repositories/TodoTaskRepository";
-import { BurnDownSnapshot } from "@/domain/entities/BurnDownSnapshot";
 import { nanoid } from "nanoid";
-
-export interface SprintWithCapacities extends Sprint {
-  capacities: Capacity[];
-}
 
 export class ManageSprintUseCase {
   constructor(
     private sprintRepository: SprintRepository,
-    private capacityRepository: CapacityRepository,
     private backlogRepository: BacklogRepository,
-    private burnDownSnapshotRepository?: BurnDownSnapshotRepository,
-    private taskRepository?: TaskRepository,
-    private todoTaskRepository?: TodoTaskRepository,
+    private taskRepository: TaskRepository,
   ) {}
 
   async getSprints(): Promise<Sprint[]> {
     return this.sprintRepository.findAll();
-  }
-
-  async getSprintsWithCapacities(): Promise<SprintWithCapacities[]> {
-    const sprints = await this.sprintRepository.findAll();
-    return Promise.all(
-      sprints.map(async (sprint) => {
-        const capacities = await this.capacityRepository.findBySprintId(
-          sprint.id,
-        );
-        return {
-          ...sprint,
-          capacities,
-        } as SprintWithCapacities;
-      }),
-    );
   }
 
   async getSprintById(id: string): Promise<Sprint | null> {
@@ -52,33 +25,38 @@ export class ManageSprintUseCase {
     endDate: Date;
     goal?: string;
   }): Promise<Sprint> {
+    const days: SprintDay[] = [];
+    const current = new Date(data.startDate);
+    current.setHours(0, 0, 0, 0);
+    const end = new Date(data.endDate);
+    end.setHours(0, 0, 0, 0);
+
+    let iterations = 0;
+    const MAX_ITERATIONS = 100;
+
+    while (current <= end && iterations < MAX_ITERATIONS) {
+      days.push({
+        date: new Date(current),
+        capacity: 4, // デフォルトキャパシティ
+        remaining: null,
+        note: null,
+      });
+      current.setDate(current.getDate() + 1);
+      iterations++;
+    }
+
     const sprint = new Sprint(
       nanoid(),
       data.name,
       data.startDate,
       data.endDate,
       data.goal || null,
+      "planning",
+      null,
+      days,
     );
 
     await this.sprintRepository.save(sprint);
-
-    // スプリント期間中の日ごとのキャパシティをデフォルト(4パルス)で生成
-    const capacities: Capacity[] = [];
-    const current = new Date(data.startDate);
-    let iterations = 0;
-    const MAX_ITERATIONS = 100; // 最大100日分に制限
-
-    while (current <= data.endDate && iterations < MAX_ITERATIONS) {
-      capacities.push(new Capacity(nanoid(), sprint.id, new Date(current), 4));
-      current.setDate(current.getDate() + 1);
-      iterations++;
-    }
-
-    if (iterations >= MAX_ITERATIONS) {
-      console.warn('Reached MAX_ITERATIONS in createSprint. Sprint duration might be too long.');
-    }
-
-    await this.capacityRepository.saveAll(capacities);
     return sprint;
   }
 
@@ -90,7 +68,8 @@ export class ManageSprintUseCase {
       endDate: Date;
       goal?: string;
       status?: SprintStatus;
-      retrospective?: string;
+      retrospective?: string | null;
+      days?: SprintDay[];
     },
   ): Promise<void> {
     const sprint = await this.sprintRepository.findById(id);
@@ -103,8 +82,8 @@ export class ManageSprintUseCase {
     sprint.endDate = data.endDate;
     if (data.goal !== undefined) sprint.goal = data.goal;
     if (data.status !== undefined) sprint.status = data.status;
-    if (data.retrospective !== undefined)
-      sprint.retrospective = data.retrospective;
+    if (data.retrospective !== undefined) sprint.retrospective = data.retrospective;
+    if (data.days !== undefined) sprint.days = data.days;
 
     await this.sprintRepository.save(sprint);
 
@@ -125,60 +104,39 @@ export class ManageSprintUseCase {
       }
     }
 
-    // 2. 未完了の Todo タスクを戻す (sprintId を null にする)
-    if (this.todoTaskRepository) {
-      const todoTasks = await this.todoTaskRepository.findBySprintId(sprintId);
-      for (const todoTask of todoTasks) {
-        if (todoTask.status !== "done") {
-          todoTask.sprintId = null;
-          await this.todoTaskRepository.save(todoTask);
-        }
+    // 2. 未完了のタスクを戻す (sprintId を null にする)
+    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    for (const task of tasks) {
+      if (task.status !== "done") {
+        task.sprintId = null;
+        await this.taskRepository.save(task);
       }
     }
   }
 
   private async isBacklogItemDone(backlogItemId: string): Promise<boolean> {
-    if (!this.taskRepository) return false;
     const tasks = await this.taskRepository.findByBacklogItemId(backlogItemId);
-    if (tasks.length === 0) return false; // タスクがない場合は未着手
+    if (tasks.length === 0) return false;
     return tasks.every((t) => t.status === "done");
   }
 
   async deleteSprint(id: string): Promise<void> {
-    // 0. スナップショットを削除
-    if (this.burnDownSnapshotRepository) {
-      await this.burnDownSnapshotRepository.deleteBySprintId(id);
-    }
-
-    // 1. キャパシティを削除
-    await this.capacityRepository.deleteBySprintId(id);
-
-    // 2. バックログアイテムの紐付けを解除
+    // 1. バックログアイテムの紐付けを解除
     const items = await this.getItemsInSprint(id);
     for (const item of items) {
       item.sprintId = null;
       await this.backlogRepository.save(item);
     }
 
-    // 3. Todoタスクの紐付けを解除（sprintIdをnullに）
-    if (this.todoTaskRepository) {
-      const todoTasks = await this.todoTaskRepository.findBySprintId(id);
-      for (const todoTask of todoTasks) {
-        todoTask.sprintId = null;
-        await this.todoTaskRepository.save(todoTask);
-      }
+    // 2. タスクの紐付けを解除（sprintIdをnullに）
+    const tasks = await this.taskRepository.findBySprintId(id);
+    for (const task of tasks) {
+      task.sprintId = null;
+      await this.taskRepository.save(task);
     }
 
-    // 4. スプリント本体を削除
+    // 3. スプリント本体を削除
     await this.sprintRepository.delete(id);
-  }
-
-  async getCapacities(sprintId: string): Promise<Capacity[]> {
-    return this.capacityRepository.findBySprintId(sprintId);
-  }
-
-  async updateCapacities(capacities: Capacity[]): Promise<void> {
-    await this.capacityRepository.saveAll(capacities);
   }
 
   async addBacklogItemToSprint(
@@ -207,7 +165,6 @@ export class ManageSprintUseCase {
 
   async calculateVelocity(sprintId: string): Promise<number> {
     const items = await this.getItemsInSprint(sprintId);
-    // すべてのタスクが 'done' であるアイテムのストーリーポイントを合計する
     let velocity = 0;
     for (const item of items) {
       const isDone = await this.isBacklogItemDone(item.id);
@@ -219,153 +176,83 @@ export class ManageSprintUseCase {
   }
 
   async calculateRemainingPulse(sprintId: string): Promise<number> {
-    const stats = await this.getSprintPulseStats(sprintId);
-    return stats.totalEstPulse - stats.plannedActualPulse;
+    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    return tasks.reduce((sum, task) => sum + (task.status !== "pooled" ? task.remainingPulse : 0), 0);
   }
 
-  /**
-   * スプリント内のパルス統計を取得する
-   */
+  async calculateInitialEstimate(sprintId: string): Promise<number> {
+    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    return tasks.reduce((sum, task) => sum + (task.status !== "pooled" ? task.estimatedPulse : 0), 0);
+  }
+
   async getSprintPulseStats(sprintId: string): Promise<{
     totalEstPulse: number;
-    plannedActualPulse: number;
+    remainingPulse: number;
     totalActualPulse: number;
   }> {
-    if (!this.taskRepository || !this.todoTaskRepository) {
-      throw new Error("TaskRepository and TodoTaskRepository are required");
-    }
-
+    const tasks = await this.taskRepository.findBySprintId(sprintId);
     let totalEstPulse = 0;
-    let plannedActualPulse = 0;
+    let remainingPulse = 0;
     let totalActualPulse = 0;
 
-    // スプリント内のバックログアイテム配下のタスク
-    const items = await this.getItemsInSprint(sprintId);
-    for (const item of items) {
-      const tasks = await this.taskRepository.findByBacklogItemId(item.id);
-      for (const task of tasks) {
-        if (task.status !== "pooled") {
-          totalEstPulse += task.estimatedPulse;
-          totalActualPulse += task.actualPulse;
-          if (task.status === "done") {
-            plannedActualPulse += task.estimatedPulse;
-          }
-        }
+    for (const task of tasks) {
+      if (task.status !== "pooled") {
+        totalEstPulse += task.estimatedPulse;
+        remainingPulse += task.remainingPulse;
+        totalActualPulse += task.actualPulse;
       }
     }
 
-    // スプリント内のTodoタスク
-    const todoTasks = await this.todoTaskRepository.findBySprintId(sprintId);
-    for (const todoTask of todoTasks) {
-      if (todoTask.status !== "pooled") {
-        totalEstPulse += todoTask.estimatedPulse;
-        totalActualPulse += todoTask.actualPulse;
-        if (todoTask.status === "done") {
-          plannedActualPulse += todoTask.estimatedPulse;
-        }
-      }
-    }
-
-    return { totalEstPulse, plannedActualPulse, totalActualPulse };
+    return { totalEstPulse, remainingPulse, totalActualPulse };
   }
 
   async takeSnapshot(sprintId: string, date?: Date): Promise<void> {
-    if (
-      !this.burnDownSnapshotRepository ||
-      !this.taskRepository ||
-      !this.todoTaskRepository
-    ) {
-      throw new Error("Required repositories are not set");
-    }
+    const sprint = await this.sprintRepository.findById(sprintId);
+    if (!sprint) throw new Error("Sprint not found");
 
     const targetDate = date || new Date();
-    targetDate.setHours(0, 0, 0, 0);
-
-    // 既にスナップショットがあるか確認（上書きするため取得）
-    const existing =
-      await this.burnDownSnapshotRepository.findBySprintIdAndDate(
-        sprintId,
-        targetDate,
-      );
+    const dateStr = targetDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
     const remainingPulse = await this.calculateRemainingPulse(sprintId);
 
-    if (existing) {
-      // 既存のスナップショットを上書き（新しいインスタンスを作成）
-      const updatedSnapshot = new BurnDownSnapshot(
-        existing.id,
-        existing.sprintId,
-        existing.date,
-        remainingPulse,
-        new Date(), // updatedAt は新しい日付を使用
-      );
-      await this.burnDownSnapshotRepository.save(updatedSnapshot);
-    } else {
-      // 新規作成
-      const snapshot = new BurnDownSnapshot(
-        nanoid(),
-        sprintId,
-        targetDate,
-        remainingPulse,
-      );
-      await this.burnDownSnapshotRepository.save(snapshot);
-    }
-  }
+    // sprint.days の中から一致する日を探して remaining を更新
+    const day = sprint.days.find(d => {
+      const dDateStr = d.date instanceof Date ? d.date.toISOString().split("T")[0] : new Date(d.date).toISOString().split("T")[0];
+      return dDateStr === dateStr;
+    });
 
-  async getSnapshots(sprintId: string): Promise<BurnDownSnapshot[]> {
-    if (!this.burnDownSnapshotRepository) {
-      throw new Error("BurnDownSnapshotRepository is not set");
+    if (day) {
+      day.remaining = remainingPulse;
+      await this.sprintRepository.save(sprint);
     }
-
-    return this.burnDownSnapshotRepository.findBySprintId(sprintId);
   }
 
   async fillMissingSnapshots(sprintId: string): Promise<void> {
-    if (
-      !this.burnDownSnapshotRepository ||
-      !this.taskRepository ||
-      !this.todoTaskRepository
-    ) {
-      throw new Error("Required repositories are not set");
-    }
-
     const sprint = await this.sprintRepository.findById(sprintId);
     if (!sprint) return;
 
-    const startDate = new Date(sprint.startDate);
-    startDate.setHours(0, 0, 0, 0);
+    const totalEst = await this.calculateInitialEstimate(sprintId);
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
+    // 今日より前の日で remaining が null の日を補完
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const currentDate = new Date(startDate);
-    let iterations = 0;
-    const MAX_ITERATIONS = 100;
+    let prevRemaining = totalEst;
 
-    while (currentDate <= yesterday && iterations < MAX_ITERATIONS) {
-      const existing =
-        await this.burnDownSnapshotRepository.findBySprintIdAndDate(
-          sprintId,
-          currentDate,
-        );
-      if (!existing) {
-        const remainingPulse = await this.calculateRemainingPulse(sprintId);
+    for (const day of sprint.days) {
+      const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+      dayDate.setHours(0, 0, 0, 0);
 
-        const snapshot = new BurnDownSnapshot(
-          nanoid(),
-          sprintId,
-          new Date(currentDate),
-          remainingPulse,
-        );
-        await this.burnDownSnapshotRepository.save(snapshot);
+      if (dayDate < today) {
+        if (day.remaining === null) {
+          day.remaining = prevRemaining;
+        } else {
+          prevRemaining = day.remaining;
+        }
       }
-      currentDate.setDate(currentDate.getDate() + 1);
-      iterations++;
     }
 
-    if (iterations >= MAX_ITERATIONS) {
-      console.warn('Reached MAX_ITERATIONS in fillMissingSnapshots. Sprint might be too old.');
-    }
+    await this.sprintRepository.save(sprint);
   }
 }
+

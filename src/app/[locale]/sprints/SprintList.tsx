@@ -11,7 +11,16 @@ import {
 import styles from "./page.module.css";
 import Link from "next/link";
 import { Sprint } from "@/domain/entities/Sprint";
-import { Capacity } from "@/domain/entities/Capacity";
+import { toDateKey } from "@/app/[locale]/components/chartUtils";
+
+
+interface Capacity {
+  id: string;
+  sprintId: string;
+  date: Date | string;
+  pulseCount: number;
+  note: string | null;
+}
 
 interface SprintWithCapacities extends Sprint {
   capacities: Capacity[];
@@ -278,8 +287,7 @@ function CapacityEditor({
   const [isSaving, setIsSaving] = useState(false);
   const t = useTranslations("sprints");
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const todayKey = toDateKey(new Date());
 
   const handlePulseChange = (id: string, delta: number) => {
     setCapacities((prev) =>
@@ -293,7 +301,12 @@ function CapacityEditor({
 
   const saveCapacities = async () => {
     setIsSaving(true);
-    await updateCapacitiesAction(sprintId, capacities);
+    const dataToSend = capacities.map((c) => ({
+      date: c.date,
+      capacity: c.pulseCount,
+      note: c.note,
+    }));
+    await updateCapacitiesAction(sprintId, dataToSend);
     setIsSaving(false);
   };
 
@@ -311,20 +324,15 @@ function CapacityEditor({
       </div>
       <div className={styles.capacityListList}>
         {capacities.map((c) => {
-          const d = new Date(c.date);
+          const dateKey = toDateKey(c.date);
+          const d = new Date(`${dateKey}T12:00:00+09:00`); // タイムゾーン固定で正午に設定
           const dayOfWeek = d.getDay();
           const isSat = dayOfWeek === 6;
           const isSun = dayOfWeek === 0;
+          const isHoliday = holidays.has(dateKey);
           
-          const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, "0");
-          const day = String(d.getDate()).padStart(2, "0");
-          const dateStr = `${year}-${month}-${day}`;
-          const isHoliday = holidays.has(dateStr);
-          
-          const checkDate = new Date(c.date);
-          checkDate.setHours(0, 0, 0, 0);
-          const isToday = checkDate.getTime() === today.getTime();
+          const isToday = dateKey === todayKey;
+
           
           return (
             <div key={c.id} className={`${styles.capacityRowList} ${isToday ? styles.todayRow : ""}`}>

@@ -7,32 +7,21 @@ import {
 import { LowDbBacklogRepository } from "../infrastructure/repositories/LowDbBacklogRepository.js";
 import { LowDbSprintRepository } from "../infrastructure/repositories/LowDbSprintRepository.js";
 import { LowDbTaskRepository } from "../infrastructure/repositories/LowDbTaskRepository.js";
-import { LowDbTodoTaskRepository } from "../infrastructure/repositories/LowDbTodoTaskRepository.js";
-import { LowDbCapacityRepository } from "../infrastructure/repositories/LowDbCapacityRepository.js";
-import { LowDbBurnDownSnapshotRepository } from "../infrastructure/repositories/LowDbBurnDownSnapshotRepository.js";
 import { ManageBacklogUseCase } from "../application/use-cases/ManageBacklogUseCase.js";
 import { ManageSprintUseCase } from "../application/use-cases/ManageSprintUseCase.js";
-import { ManageTodoUseCase } from "../application/use-cases/ManageTodoUseCase.js";
 import { SprintStatus } from "../domain/entities/Sprint.js";
 
 // リポジトリとユースケースの初期化
 const backlogRepository = new LowDbBacklogRepository();
 const sprintRepository = new LowDbSprintRepository();
 const taskRepository = new LowDbTaskRepository();
-const todoTaskRepository = new LowDbTodoTaskRepository();
-const capacityRepository = new LowDbCapacityRepository();
-const burnDownSnapshotRepository = new LowDbBurnDownSnapshotRepository();
 
 const backlogUseCase = new ManageBacklogUseCase(backlogRepository, taskRepository);
 const sprintUseCase = new ManageSprintUseCase(
   sprintRepository,
-  capacityRepository,
   backlogRepository,
-  burnDownSnapshotRepository,
-  taskRepository,
-  todoTaskRepository
+  taskRepository
 );
-const todoUseCase = new ManageTodoUseCase(todoTaskRepository);
 
 const server = new Server(
   {
@@ -171,18 +160,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!sprint) throw new Error("Sprint not found");
 
         const items = await sprintUseCase.getItemsInSprint(sprintId);
-        const capacities = await sprintUseCase.getCapacities(sprintId);
+        const tasks = await taskRepository.findBySprintId(sprintId);
         
         return {
           content: [{
             type: "text",
-            text: JSON.stringify({ sprint, items, capacities }, null, 2)
+            text: JSON.stringify({ sprint, items, tasks }, null, 2)
           }]
         };
       }
 
       case "get_todo_tasks": {
-        const unassigned = await todoUseCase.getUnassignedTodoTasks();
+        const unassigned = await taskRepository.findPooled();
         return { content: [{ type: "text", text: JSON.stringify(unassigned, null, 2) }] };
       }
 
@@ -246,3 +235,4 @@ main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
+

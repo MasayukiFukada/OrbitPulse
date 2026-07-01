@@ -11,6 +11,7 @@ export class BacklogItem {
     public storyPoints: number = 0,
     public status: BacklogItemStatus = "backlog",
     public sprintId: string | null = null,
+    public categoryId: string | null = null,
     public priority: number = 0,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
@@ -18,3 +19,4 @@ export class BacklogItem {
 
   // 必要に応じてドメインロジック（ステータス遷移のバリデーションとか）をここに追加する
 }
+

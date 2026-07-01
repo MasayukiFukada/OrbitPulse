@@ -1,138 +1,84 @@
 import { TaskRepository } from "@/domain/repositories/TaskRepository";
 import { Task, TaskStatus } from "@/domain/entities/Task";
-import { getDb, RawSprint, RawBacklogItem, RawTask } from "../db/json-db";
+import { getDb, RawTask } from "../db/json-db";
 
 export class LowDbTaskRepository implements TaskRepository {
+  async findAll(): Promise<Task[]> {
+    const db = await getDb();
+    await db.read();
+    return db.data.tasks.map((t: RawTask) => this.toEntity(t));
+  }
+
   async findByBacklogItemId(backlogItemId: string): Promise<Task[]> {
     const db = await getDb();
     await db.read();
-    
-    // バックログアイテムの中から該当するものを探し、そのタスクを返す
-    for (const s of db.data.sprints) {
-      if (s.backlogItems) {
-        const item = s.backlogItems.find((i: RawBacklogItem) => i.id === backlogItemId);
-        if (item && item.tasks) {
-          return item.tasks.map((t: RawTask) => this.toEntity(t));
-        }
-      }
-    }
-    
-    // 未割当バックログからも探す
-    if (db.data.backlogItems) {
-      const item = db.data.backlogItems.find((i: RawBacklogItem) => i.id === backlogItemId);
-      if (item && item.tasks) {
-        return item.tasks.map((t: RawTask) => this.toEntity(t));
-      }
-    }
+    return db.data.tasks
+      .filter((t: RawTask) => t.backlogItemId === backlogItemId)
+      .map((t: RawTask) => this.toEntity(t));
+  }
 
-    return [];
+  async findBySprintId(sprintId: string): Promise<Task[]> {
+    const db = await getDb();
+    await db.read();
+    return db.data.tasks
+      .filter((t: RawTask) => t.sprintId === sprintId)
+      .map((t: RawTask) => this.toEntity(t));
+  }
+
+  async findPooled(): Promise<Task[]> {
+    const db = await getDb();
+    await db.read();
+    return db.data.tasks
+      .filter((t: RawTask) => t.sprintId === null && t.backlogItemId === null)
+      .map((t: RawTask) => this.toEntity(t));
   }
 
   async findById(id: string): Promise<Task | null> {
     const db = await getDb();
     await db.read();
-    
-    // 全てのバックログアイテムの中からタスクを探す
-    const findInItems = (items: RawBacklogItem[]) => {
-      for (const item of items) {
-        if (item.tasks) {
-          const found = item.tasks.find((t: RawTask) => t.id === id);
-          if (found) return found;
-        }
-      }
-      return null;
-    };
-
-    // スプリント内のバックログ
-    for (const s of db.data.sprints) {
-      if (s.backlogItems) {
-        const found = findInItems(s.backlogItems);
-        if (found) return this.toEntity(found);
-      }
-    }
-
-    // 未割当バックログ
-    if (db.data.backlogItems) {
-      const found = findInItems(db.data.backlogItems);
-      if (found) return this.toEntity(found);
-    }
-
-    return null;
+    const found = db.data.tasks.find((t: RawTask) => t.id === id);
+    return found ? this.toEntity(found) : null;
   }
 
   async save(item: Task): Promise<void> {
     const db = await getDb();
     await db.read();
     const raw = this.toRaw(item);
-    let saved = false;
+    const index = db.data.tasks.findIndex((t: RawTask) => t.id === item.id);
 
-    const saveToItems = (items: RawBacklogItem[]) => {
-      const itemIndex = items.findIndex(i => i.id === item.backlogItemId);
-      if (itemIndex !== -1) {
-        if (!items[itemIndex].tasks) items[itemIndex].tasks = [];
-        const tasks = items[itemIndex].tasks;
-        const taskIndex = tasks.findIndex((t: RawTask) => t.id === item.id);
-        
-        if (taskIndex !== -1) {
-          tasks[taskIndex] = raw;
-        } else {
-          tasks.push(raw);
-        }
-        return true;
-      }
-      return false;
-    };
-
-    // スプリント内のバックログに保存
-    for (const s of db.data.sprints) {
-      if (s.backlogItems) {
-        if (saveToItems(s.backlogItems)) {
-          saved = true;
-          break;
-        }
-      }
+    if (index !== -1) {
+      db.data.tasks[index] = {
+        ...raw,
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      db.data.tasks.push(raw);
     }
 
-    // 未割当バックログに保存
-    if (!saved && db.data.backlogItems) {
-      if (saveToItems(db.data.backlogItems)) {
-        saved = true;
-      }
-    }
-
-    if (saved) {
-      await db.write();
-    }
+    await db.write();
   }
 
   async delete(id: string): Promise<void> {
     const db = await getDb();
-    
-    const deleteFromItems = (items: RawBacklogItem[]) => {
-      items.forEach(item => {
-        if (item.tasks) {
-          item.tasks = item.tasks.filter((t: RawTask) => t.id !== id);
-        }
-      });
-    };
-
-    db.data.sprints.forEach((s: RawSprint) => {
-      if (s.backlogItems) deleteFromItems(s.backlogItems);
-    });
-    
-    if (db.data.backlogItems) deleteFromItems(db.data.backlogItems);
-
+    await db.read();
+    db.data.tasks = db.data.tasks.filter((t: RawTask) => t.id !== id);
     await db.write();
   }
 
   private toEntity(data: RawTask): Task {
     return new Task(
       data.id,
-      data.backlogItemId,
       data.title,
       data.status as TaskStatus,
+      data.sprintId,
+      data.backlogItemId,
+      data.categoryId,
+      data.recurringTaskId,
       data.estimatedPulse,
       data.actualPulse,
+      data.remainingPulse,
+      data.deadline ? new Date(data.deadline) : null,
+      data.priority,
       new Date(data.createdAt),
       new Date(data.updatedAt)
     );
@@ -141,13 +87,20 @@ export class LowDbTaskRepository implements TaskRepository {
   private toRaw(item: Task): RawTask {
     return {
       id: item.id,
+      sprintId: item.sprintId,
       backlogItemId: item.backlogItemId,
+      categoryId: item.categoryId,
+      recurringTaskId: item.recurringTaskId,
       title: item.title,
       status: item.status,
       estimatedPulse: item.estimatedPulse,
       actualPulse: item.actualPulse,
+      remainingPulse: item.remainingPulse,
+      deadline: item.deadline ? item.deadline.toISOString() : null,
+      priority: item.priority,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
     };
   }
 }
+

@@ -2,6 +2,8 @@
   "common": {
     "backlog": "バックログ",
     "sprints": "スプリント",
+    "recurringSettings": "繰り返し設定",
+    "tasksSettings": "タスク設定",
     "edit": "編集",
     "delete": "削除",
     "save": "保存",
@@ -16,7 +18,10 @@
     "burnDownChart": "バーンダウンチャート",
     "noActiveSprint": "アクティブなスプリントがありません。スプリントを開始してください。",
     "currentSprint": "現在のスプリント: <link>{name}</link>",
-    "velocity": "現在のベロシティ: {value} pt"
+    "velocity": "現在のベロシティ: {value} pt",
+    "recurringChartTitle": "今後14日間の繰り返しタスク予定",
+    "taskCount": "{count} 件",
+    "chartTotal": "合計"
   },
   "backlog": {
     "title": "プロダクトバックログ",
@@ -115,5 +120,84 @@
   "metadata": {
     "title": "OrbitPulse",
     "description": "個人のためのスクラム管理システム"
+  },
+  "recurring": {
+    "title": "繰り返しタスク・カテゴリ設定",
+    "recurringSection": "繰り返しタスク設定",
+    "categorySection": "カテゴリ管理",
+    "noRecurringTasks": "繰り返しタスクはまだ登録されていません。",
+    "noCategories": "カテゴリはまだ登録されていません。",
+    "createRecurring": "新規繰り返しタスク作成",
+    "editRecurring": "繰り返しタスク編集",
+    "createCategory": "新規カテゴリ作成",
+    "editCategory": "カテゴリ編集",
+    "taskTitle": "タスク名",
+    "pattern": "繰り返し周期",
+    "patternDaily": "毎日",
+    "patternWeekly": "毎週",
+    "patternMonthly": "毎月",
+    "patternValueWeeklyPlaceholder": "例: 1,3,5 (月,水,金)",
+    "patternValueMonthlyPlaceholder": "例: 1,15 (1日,15日)",
+    "patternValueLabel": "パターンの値",
+    "estimatedPulse": "見積 (Pulse)",
+    "categoryLabel": "カテゴリ",
+    "colorLabel": "カラー",
+    "deleteCategoryConfirm": "このカテゴリを削除してもええか？（紐付いてるタスクのカテゴリは未分類になるで）",
+    "deleteRecurringConfirm": "この繰り返しタスクを削除してもええか？",
+    "daysOfWeek": {
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土",
+      "7": "日"
+    }
+  },
+  "tasks": {
+    "title": "タスク一元管理",
+    "productTasksSection": "プロダクトバックログ紐付きタスク",
+    "todoTasksSection": "単発ToDoタスク（プロダクト外）",
+    "noTasks": "タスクはまだ登録されていません。",
+    "createTask": "新規タスク作成",
+    "editTask": "タスク編集",
+    "taskTitle": "タスク名",
+    "estimatedPulse": "見積 (Pulse)",
+    "backlogItemLabel": "紐づくプロダクトバックログ",
+    "none": "なし (単発ToDoになります)",
+    "categoryLabel": "カテゴリ",
+    "sprintLabel": "アサイン先スプリント",
+    "sprintNone": "未割り当て (プールに入ります)",
+    "deadlineLabel": "期日",
+    "priorityLabel": "優先度",
+    "statusLabel": "ステータス",
+    "deleteConfirm": "このタスクを削除してもええか？",
+    "unassigned": "スプリント未割り当て",
+    "sprintAssigned": "スプリント: {name}"
+  },
+  "ignite": {
+    "title": "イグナイトガチャ",
+    "draw": "ガチャを引く",
+    "drawReroll": "もう一度引く",
+    "drawRitual": "モチベーション点火！",
+    "currentRitual": "本日のイグナイトタスク",
+    "noTemplates": "ガチャ候補のタスクが登録されていません。「イグナイト設定」から登録してください。",
+    "rarityCommon": "Common (通常)",
+    "rarityRare": "Rare (珍しい)",
+    "raritySuperRare": "Super Rare (貴重)",
+    "rarityUltraRare": "Ultra Rare (極稀)",
+    "igniteHeaderBtn": "🍅 Ignite!",
+    "pomodoroStart": "儀式開始！"
+  },
+  "igniteSettings": {
+    "title": "イグナイトタスク設定",
+    "sectionTitle": "ガチャ候補（儀式タスク）の一覧",
+    "noTasks": "ガチャ候補のタスクはまだ登録されていません。",
+    "createTask": "新規ガチャ候補作成",
+    "editTask": "ガチャ候補編集",
+    "taskTitle": "儀式（タスク）名",
+    "rarityLabel": "レアリティ",
+    "estimatedPulse": "見積 (Pulse)",
+    "deleteConfirm": "このガチャ候補を削除してもええか？"
   }
 }

@@ -48,6 +48,7 @@ export default async function BacklogPage() {
     storyPoints: item.storyPoints ?? 0,
     status: item.status,
     sprintId: item.sprintId ?? null,
+    categoryId: item.categoryId ?? null,
     priority: item.priority ?? 0,
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,

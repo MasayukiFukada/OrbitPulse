@@ -1,511 +1,703 @@
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+  width: 100%;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .headerLeft {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .backLink {
-    color: #666;
-    text-decoration: none;
-    font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: var(--primary);
 }
 
 .title {
-    margin: 0;
-    font-size: 1.75rem;
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-main);
 }
 
 .status {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 99px;
-    text-transform: uppercase;
-    font-weight: bold;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
-.planning {
-    background: #e0e0e0;
-    color: #666;
+.status.planning {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-muted);
 }
-.active {
-    background: #e3f2fd;
-    color: #1976d2;
+.status.active {
+  background: #e3f2fd;
+  color: #1976d2;
 }
-.completed {
-    background: #e8f5e9;
-    color: #388e3c;
-}
-
-.startButton {
-    padding: 0.6rem 1.2rem;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
+.status.completed {
+  background: #e8f5e9;
+  color: #388e3c;
 }
 
-.completeButton {
-    padding: 0.6rem 1.2rem;
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
+.actionBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
-.goalBox {
-    background-color: #fff3f3;
-    border-left: 4px solid #d32f2f;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    border-radius: 0 4px 4px 0;
+.actionBtn:active {
+  transform: scale(0.98);
 }
 
-.dashboard {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.startBtn {
+  background-color: var(--primary);
+  color: white;
+}
+
+.startBtn:hover {
+  background-color: var(--primary-hover);
+}
+
+.completeBtn {
+  background-color: #10b981;
+  color: white;
+}
+
+.completeBtn:hover {
+  background-color: #059669;
+}
+
+.goalSection {
+  background: var(--card-bg);
+  border-left: 4px solid var(--primary);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  box-shadow: var(--shadow);
+}
+
+.goalLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.goalContent {
+  margin: 0.25rem 0 0 0;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .statCard {
-    background: white;
-    border: 1px solid #eee;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-    min-width: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--shadow);
 }
 
 .statLabel {
-    font-size: 0.8rem;
-    color: #666;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .statValue {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-main);
 }
 
-.gridFull {
-    display: grid;
+.statValue.warning {
+  color: #ef4444;
+}
+
+.alertText {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.warningAlert {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #b45309;
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ボードレイアウト */
+.boardLayout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .boardLayout {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
+  }
 }
 
-.sectionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+/* 左側セクション: チャートとストーリー計画 */
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.chartWrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.planningArea {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .sectionTitle {
-    font-size: 1.2rem;
-    margin: 0;
-    color: #444;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.pulseControl {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: #f5f5f5;
-    padding: 0.25rem;
-    border-radius: 4px;
+.sectionTitle::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 1.1rem;
+  background: var(--primary);
+  border-radius: 2px;
 }
 
-.pulseBtn {
-    width: 24px;
-    height: 24px;
-    border: none;
-    background: white;
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.pulseValue {
-    font-weight: bold;
-    min-width: 20px;
-    text-align: center;
-}
-
-.noteInput {
-    flex: 1;
-    border: none;
-    border-bottom: 1px solid #eee;
-    padding: 0.25rem;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.noteInput:focus {
-    outline: none;
-    border-color: #0070f3;
-}
-
-.itemList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
-}
-
-.itemGroup {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
+.sprintItemList,
+.availableItemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .itemCard {
-    background: #fcfcfc;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: background-color 0.2s;
 }
 
-.taskList {
-    padding: 0.5rem 1rem 1rem 2rem;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.taskRow {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 4px;
-    background: #f9f9f9;
-    font-size: 0.9rem;
-}
-
-.taskRow.todo {
-    border-left: 3px solid #ccc;
-}
-.taskRow.doing {
-    border-left: 3px solid #0070f3;
-    background: #f0f7ff;
-}
-.taskRow.done {
-    border-left: 3px solid #10b981;
-    opacity: 0.7;
-}
-.taskRow.pooled {
-    border-left: 3px dashed #ffa500;
-    background: #fff8e1;
-}
-.taskRow.done .taskTitle {
-    text-decoration: line-through;
-    color: #999;
-}
-
-.statusSelect {
-    font-size: 0.7rem;
-    padding: 0.2rem;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    background: white;
-}
-
-.taskTitleInput {
-    flex: 1;
-    border: 1px solid transparent;
-    background: transparent;
-    padding: 0.2rem 0.4rem;
-    font-size: 0.9rem;
-    border-radius: 4px;
-}
-
-.taskTitleInput:hover {
-    background: #eee;
-}
-
-.taskTitleInput:focus {
-    outline: none;
-    background: white;
-    border-color: #0070f3;
-}
-
-.taskRow.done .taskTitleInput {
-    text-decoration: line-through;
-    color: #999;
-}
-
-.taskTitleWarning,
-.taskRow.done .taskTitleWarning {
-    color: #ff9800 !important;
-}
-
-.taskDeadline {
-    margin-right: 0.5rem;
-}
-
-.deadlineInput {
-    border: none;
-    background: #eee;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    color: #666;
-}
-
-.addTaskDeadline {
-    border: 1px dashed #ddd;
-    border-radius: 4px;
-    padding: 0.4rem;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.taskPulseControls {
-    display: flex;
-    gap: 1rem;
-}
-
-.pulseGroup {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.pulseLabel {
-    font-size: 0.7rem;
-    color: #999;
-    font-weight: bold;
-}
-
-.addTaskEst {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: #f0f0f0;
-    padding: 0 0.5rem;
-    border-radius: 4px;
-}
-
-.estInput {
-    width: 30px;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-size: 0.85rem;
-    padding: 0.25rem 0;
-}
-
-.estInput::-webkit-inner-spin-button,
-.estInput::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.estUnit {
-    font-size: 0.75rem;
-    color: #666;
-}
-
-.taskPulseControl {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: white;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    border: 1px solid #eee;
-}
-
-.pulseBtnSmall {
-    width: 18px;
-    height: 18px;
-    border: none;
-    background: #f0f0f0;
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-}
-
-.pulseValueSmall {
-    font-size: 0.8rem;
-    font-weight: bold;
-    min-width: 25px;
-    text-align: center;
-}
-
-.taskDeleteBtn {
-    background: none;
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    font-size: 1.1rem;
-    line-height: 1;
-}
-
-.taskDeleteBtn:hover {
-    color: #ff1744;
-}
-
-.addTaskRow {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.addTaskInput {
-    flex: 1;
-    border: 1px dashed #ddd;
-    border-radius: 4px;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.85rem;
-}
-
-.addTaskInput:focus {
-    outline: none;
-    border-color: #0070f3;
-    border-style: solid;
-}
-
-.addTaskBtn {
-    background: #f0f0f0;
-    border: none;
-    border-radius: 4px;
-    width: 30px;
-    color: #666;
-    cursor: pointer;
-}
-
-.addTaskBtn:hover {
-    background: #e0e0e0;
+.itemCard:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .itemMain {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .itemPoints {
-    background: #f0f0f0;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: bold;
+  background: var(--primary);
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .itemTitle {
-    font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .addBtn,
 .removeBtn {
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    border: 1px solid transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .addBtn {
-    background-color: #f0fff4;
-    color: #2f855a;
-    border-color: #c6f6d5;
+  background-color: #f0fff4;
+  color: #2f855a;
+  border-color: #c6f6d5;
 }
 
 .addBtn:hover {
-    background-color: #c6f6d5;
+  background-color: #c6f6d5;
 }
 
 .removeBtn {
-    background-color: #fff5f5;
-    color: #c53030;
-    border-color: #fed7d7;
+  background-color: #fff5f5;
+  color: #c53030;
+  border-color: #fed7d7;
 }
 
 .removeBtn:hover {
-    background-color: #fed7d7;
+  background-color: #fed7d7;
 }
 
 .backlogTitle {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--border-color);
 }
 
-.filterContainer {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+/* 右側セクション: カンバンボード */
+.kanbanSection {
+  width: 100%;
 }
 
-.filterLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.85rem;
-    cursor: pointer;
+.kanbanBoard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  align-items: start;
 }
 
-.statusDot {
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: bold;
+@media (max-width: 768px) {
+  .kanbanBoard {
+    grid-template-columns: 1fr;
+  }
 }
 
-.statusDot.todo {
-    background: #ccc;
-    color: #333;
+/* 通常のカラム（Active, Completed） */
+.kanbanColumn {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  height: 800px; /* カンバンの高さを800pxに拡張 */
+  overflow: hidden;
 }
-.statusDot.doing {
-    background: #0070f3;
-    color: white;
+
+/* 縦積みカラムを包むコンテナ（Ready ＆ Pooled） */
+.kanbanDoubleColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; /* 上下の物理的なギャップ */
+  height: 800px;
 }
-.statusDot.pooled {
-    background: #ffa500;
-    color: white;
+
+/* ハーフサイズカラム（縦積み用） */
+.kanbanColumnHalf {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* 高さを等分 */
+  overflow: hidden;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.statusDot.done {
-    background: #10b981;
-    color: white;
+
+.columnHeader {
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.columnHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.columnCount {
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+.pooledHeader { border-bottom-color: #f59e0b; }
+.readyHeader { border-bottom-color: #94a3b8; }
+.activeHeader { border-bottom-color: var(--primary); }
+.completedHeader { border-bottom-color: #10b981; }
+
+.kanbanCards {
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.emptyColumn {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+  margin: 0;
+}
+
+/* カンバンカード */
+.kanbanCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.kanbanCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kanbanCard.doing {
+  border-left: 4px solid var(--primary);
+  background-color: rgba(22, 173, 180, 0.01);
+}
+
+.kanbanCard.done {
+  border-left: 4px solid #10b981;
+  opacity: 0.8;
+}
+
+.kanbanCard.pooled {
+  border-left: 4px dashed #f59e0b;
+}
+
+.kanbanCard.todo {
+  border-left: 4px solid #94a3b8;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.cardBadge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  max-width: calc(100% - 24px); /* ✕ボタンと被らないように幅を制限 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+}
+
+.storyBadge {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.todoBadge {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* カード削除ボタン */
+.cardDeleteBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardDeleteBtn:hover {
+  color: #ef4444; /* ホバーで赤く光る */
+}
+
+.cardTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.kanbanCard.done .cardTitle {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* 3連数値メーターUI */
+.cardPulseControls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.pulseIndicator {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.25rem;
+  border-right: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.pulseIndicator:last-child {
+  border-right: none;
+}
+
+.pulseIndicator:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.pulseValueLarge {
+  font-size: 1.35rem; /* 数値を巨大化 */
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.pulseLabelMicro {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+  transition: opacity 0.2s ease;
+}
+
+/* ホバー時に現れるミニ増減コントロール */
+.hoverControls {
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.pulseIndicator:hover .hoverControls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ホバー時にラベルを薄くしてボタンと被らないようにする */
+.pulseIndicator:hover .pulseLabelMicro {
+  opacity: 0.1;
+}
+
+.pulseBtnMicro {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 99px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.pulseBtnMicro:hover {
+  background: var(--primary-hover);
+  transform: scale(1.15);
+}
+
+.pulseBtnMicro:active {
+  transform: scale(0.9);
+}
+
+/* インライン入力フォームのスタイル */
+.pulseInputInline {
+  width: 48px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  padding: 0;
+  margin: 0;
+  outline: none;
+  line-height: 1.1;
+}
+
+.pulseInputInline::-webkit-inner-spin-button,
+.pulseInputInline::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .empty {
-    text-align: center;
-    color: #999;
-    padding: 2rem;
-    background: #f9f9f9;
-    border-radius: 8px;
-    font-size: 0.9rem;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.01);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ドラッグ＆ドロップ用スタイル */
+.kanbanColumn.dragOver,
+.kanbanColumnHalf.dragOver {
+  border-color: var(--primary);
+  background-color: rgba(22, 173, 180, 0.04);
+  box-shadow: 0 0 15px rgba(22, 173, 180, 0.1);
+  transition: all 0.2s ease;
+}
+
+.kanbanCard:active {
+  cursor: grabbing;
+  opacity: 0.6;
+}
+
+/* イグナイトタスク専用スタイル */
+.igniteCard {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.05) 0%, rgba(255, 152, 0, 0.02) 100%) !important;
+  border: 1px solid rgba(255, 87, 34, 0.3) !important;
+  box-shadow: 0 0 10px rgba(255, 87, 34, 0.1);
+  animation: ignitePulseLight 2s infinite alternate;
+}
+
+.igniteCard:hover {
+  border-color: rgba(255, 87, 34, 0.6) !important;
+  box-shadow: 0 0 15px rgba(255, 87, 34, 0.25);
+  transform: translateY(-2px);
+}
+
+.igniteBadge {
+  background-color: #ff5722 !important;
+  color: white !important;
+  font-weight: 800;
+  box-shadow: 0 2px 5px rgba(255, 87, 34, 0.3);
+}
+
+.igniteCompleteBtn {
+  background: none;
+  border: none;
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  margin-right: 0.5rem;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.igniteCompleteBtn:hover {
+  transform: scale(1.2);
+}
+
+@keyframes ignitePulseLight {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 87, 34, 0.08);
+  }
+  100% {
+    box-shadow: 0 0 16px rgba(255, 87, 34, 0.25);
+  }
 }

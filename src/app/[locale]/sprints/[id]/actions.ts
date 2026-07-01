@@ -1,53 +1,48 @@
 "use server";
 
 import { LowDbSprintRepository } from "@/infrastructure/repositories/LowDbSprintRepository";
-import { LowDbCapacityRepository } from "@/infrastructure/repositories/LowDbCapacityRepository";
 import { LowDbBacklogRepository } from "@/infrastructure/repositories/LowDbBacklogRepository";
 import { LowDbTaskRepository } from "@/infrastructure/repositories/LowDbTaskRepository";
-import { LowDbTodoTaskRepository } from "@/infrastructure/repositories/LowDbTodoTaskRepository";
 import { ManageSprintUseCase } from "@/application/use-cases/ManageSprintUseCase";
 import { ManageTaskUseCase } from "@/application/use-cases/ManageTaskUseCase";
-import { ManageTodoUseCase } from "@/application/use-cases/ManageTodoUseCase";
 import { revalidatePath } from "next/cache";
-import { Capacity } from "@/domain/entities/Capacity";
 import { SprintStatus } from "@/domain/entities/Sprint";
 import { TaskStatus } from "@/domain/entities/Task";
-import { TodoTaskStatus } from "@/domain/entities/TodoTask";
-
-type DbCapacity = {
-  id: string;
-  sprintId: string;
-  date: Date;
-  pulseCount: number;
-  note?: string | null;
-};
 
 const sprintRepository = new LowDbSprintRepository();
-const capacityRepository = new LowDbCapacityRepository();
 const backlogRepository = new LowDbBacklogRepository();
 const taskRepository = new LowDbTaskRepository();
-const todoTaskRepository = new LowDbTodoTaskRepository();
 
 const sprintUseCase = new ManageSprintUseCase(
   sprintRepository,
-  capacityRepository,
   backlogRepository,
-  undefined, // burnDownSnapshotRepository
   taskRepository,
-  todoTaskRepository,
 );
 const taskUseCase = new ManageTaskUseCase(taskRepository);
-const todoUseCase = new ManageTodoUseCase(todoTaskRepository);
 
 export async function updateCapacitiesAction(
   sprintId: string,
-  capacitiesData: DbCapacity[],
+  capacitiesData: { date: Date | string; capacity: number; note?: string | null }[],
 ) {
-  const capacities = capacitiesData.map(
-    (c) =>
-      new Capacity(c.id, c.sprintId, new Date(c.date), c.pulseCount, c.note),
-  );
-  await sprintUseCase.updateCapacities(capacities);
+  const sprint = await sprintRepository.findById(sprintId);
+  if (!sprint) throw new Error("Sprint not found");
+
+  sprint.days = sprint.days.map((day) => {
+    const dStr = new Date(day.date).toISOString().split("T")[0];
+    const match = capacitiesData.find(
+      (c) => new Date(c.date).toISOString().split("T")[0] === dStr
+    );
+    if (match) {
+      return {
+        ...day,
+        capacity: match.capacity,
+        note: match.note || null,
+      };
+    }
+    return day;
+  });
+
+  await sprintRepository.save(sprint);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -89,7 +84,7 @@ export async function addTaskAction(
   title: string,
   estimatedPulse: number,
 ) {
-  await taskUseCase.addTask({ backlogItemId, title, estimatedPulse });
+  await taskUseCase.addTask({ sprintId, backlogItemId, title, estimatedPulse });
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -99,6 +94,15 @@ export async function updateTaskPulseAction(
   actualPulse: number,
 ) {
   await taskUseCase.updateTaskPulse(taskId, actualPulse);
+  revalidatePath(`/sprints/${sprintId}`);
+}
+
+export async function updateTaskRemainingPulseAction(
+  sprintId: string,
+  taskId: string,
+  remainingPulse: number,
+) {
+  await taskUseCase.updateTaskRemainingPulse(taskId, remainingPulse);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -140,7 +144,7 @@ export async function addTodoTaskAction(
   estimatedPulse: number,
   deadline: Date | null = null,
 ) {
-  await todoUseCase.addTodoTask({ sprintId, title, estimatedPulse, deadline });
+  await taskUseCase.addTask({ sprintId, backlogItemId: null, title, estimatedPulse, deadline });
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -149,7 +153,7 @@ export async function updateTodoDeadlineAction(
   taskId: string,
   deadline: Date | null,
 ) {
-  await todoUseCase.updateTodoDeadline(taskId, deadline);
+  await taskUseCase.updateTaskDeadline(taskId, deadline);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -158,7 +162,7 @@ export async function updateTodoPulseAction(
   taskId: string,
   actualPulse: number,
 ) {
-  await todoUseCase.updateTodoPulse(taskId, actualPulse);
+  await taskUseCase.updateTaskPulse(taskId, actualPulse);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -167,7 +171,7 @@ export async function updateTodoEstimatedPulseAction(
   taskId: string,
   estimatedPulse: number,
 ) {
-  await todoUseCase.updateTodoEstimatedPulse(taskId, estimatedPulse);
+  await taskUseCase.updateTaskEstimatedPulse(taskId, estimatedPulse);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -176,21 +180,21 @@ export async function updateTodoTitleAction(
   taskId: string,
   title: string,
 ) {
-  await todoUseCase.updateTodoTitle(taskId, title);
+  await taskUseCase.updateTaskTitle(taskId, title);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
 export async function updateTodoStatusAction(
   sprintId: string,
   taskId: string,
-  status: TodoTaskStatus,
+  status: TaskStatus,
 ) {
-  await todoUseCase.updateTodoStatus(taskId, status);
+  await taskUseCase.updateTaskStatus(taskId, status);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
 export async function deleteTodoTaskAction(sprintId: string, taskId: string) {
-  await todoUseCase.deleteTodoTask(taskId);
+  await taskUseCase.deleteTask(taskId);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -198,7 +202,7 @@ export async function assignTodoTaskToSprintAction(
   sprintId: string,
   taskId: string,
 ) {
-  await todoUseCase.assignTodoTaskToSprint(taskId, sprintId);
+  await taskUseCase.assignTaskToSprint(taskId, sprintId);
   revalidatePath(`/sprints/${sprintId}`);
 }
 
@@ -206,6 +210,7 @@ export async function unassignTodoTaskFromSprintAction(
   sprintId: string,
   taskId: string,
 ) {
-  await todoUseCase.unassignTodoTaskFromSprint(taskId);
+  await taskUseCase.unassignTaskFromSprint(taskId);
   revalidatePath(`/sprints/${sprintId}`);
 }
+

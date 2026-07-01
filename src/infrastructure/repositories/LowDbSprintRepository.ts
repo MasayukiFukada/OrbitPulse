@@ -1,7 +1,6 @@
 import { SprintRepository } from "@/domain/repositories/SprintRepository";
 import { Sprint, SprintStatus } from "@/domain/entities/Sprint";
 import { getDb, RawSprint } from "../db/json-db";
-import { RawSprint as RawSprintType } from "../db/json-db";
 
 export class LowDbSprintRepository implements SprintRepository {
   async findAll(): Promise<Sprint[]> {
@@ -32,35 +31,38 @@ export class LowDbSprintRepository implements SprintRepository {
     await db.read();
     const index = db.data.sprints.findIndex((s: RawSprint) => s.id === item.id);
     
+    const rawDays = item.days.map(d => ({
+      date: d.date.toISOString(),
+      capacity: d.capacity,
+      remaining: d.remaining,
+      note: d.note
+    }));
+
     if (index !== -1) {
-      // 既存データの更新（ネストされたデータは保持する）
-      const existing = db.data.sprints[index];
       db.data.sprints[index] = {
-        ...existing,
+        id: item.id,
         name: item.name,
         goal: item.goal,
         startDate: item.startDate.toISOString(),
         endDate: item.endDate.toISOString(),
-        status: item.status as RawSprintType['status'],
+        status: item.status,
         retrospective: item.retrospective,
+        days: rawDays,
+        createdAt: item.createdAt.toISOString(),
         updatedAt: new Date().toISOString(),
       };
     } else {
-      // 新規作成
       db.data.sprints.push({
         id: item.id,
         name: item.name,
         goal: item.goal,
         startDate: item.startDate.toISOString(),
         endDate: item.endDate.toISOString(),
-        status: item.status as RawSprintType['status'],
+        status: item.status,
         retrospective: item.retrospective,
+        days: rawDays,
         createdAt: item.createdAt.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
-        todoTasks: [],
-        backlogItems: [],
-        capacities: [],
-        snapshots: [],
       });
     }
 
@@ -83,8 +85,15 @@ export class LowDbSprintRepository implements SprintRepository {
       data.goal,
       data.status as SprintStatus,
       data.retrospective,
+      data.days ? data.days.map(d => ({
+        date: new Date(d.date),
+        capacity: d.capacity,
+        remaining: d.remaining,
+        note: d.note
+      })) : [],
       new Date(data.createdAt),
       new Date(data.updatedAt)
     );
   }
 }
+

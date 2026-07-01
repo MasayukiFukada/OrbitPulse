@@ -51,6 +51,7 @@ export class ManageBacklogUseCase {
     description?: string;
     acceptanceCriteria?: string;
     storyPoints?: number;
+    categoryId?: string | null;
   }): Promise<BacklogItem> {
     const newItem = new BacklogItem(
       nanoid(),
@@ -61,6 +62,8 @@ export class ManageBacklogUseCase {
       data.acceptanceCriteria || null,
       data.storyPoints || 0,
       "backlog",
+      null,
+      data.categoryId || null,
     );
     await this.backlogRepository.save(newItem);
     return newItem;
@@ -75,6 +78,7 @@ export class ManageBacklogUseCase {
       description?: string;
       acceptanceCriteria?: string;
       storyPoints?: number;
+      categoryId?: string | null;
     },
   ): Promise<void> {
     const item = await this.backlogRepository.findById(id);
@@ -86,6 +90,7 @@ export class ManageBacklogUseCase {
     item.description = data.description || null;
     item.acceptanceCriteria = data.acceptanceCriteria || null;
     item.storyPoints = data.storyPoints || 0;
+    if (data.categoryId !== undefined) item.categoryId = data.categoryId;
 
     await this.backlogRepository.save(item);
   }

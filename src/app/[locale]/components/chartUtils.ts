@@ -1,3 +1,6 @@
+import { RecurringTask } from "@/domain/entities/RecurringTask";
+import { Category } from "@/domain/entities/Category";
+
 const CHART_TIME_ZONE = "Asia/Tokyo";
 
 export interface ChartData {
@@ -53,96 +56,133 @@ export function addCalendarDays(date: Date | string, days: number): Date {
  * バーンダウンチャート用のデータを生成する
  */
 export function generateBurnDownChartData(params: {
-  sprint: SprintInfo;
-  capacities: CapacityInfo[];
-  snapshots: SnapshotInfo[];
+  sprint: {
+    startDate: Date | string;
+    endDate: Date | string;
+    days: {
+      date: Date | string;
+      capacity: number;
+      remaining: number | null;
+      note: string | null;
+    }[];
+  };
   totalEstPulse: number;
-  plannedActualPulse: number;
-  velocity: number;
+  today?: Date;
 }): ChartData[] {
-  const {
-    sprint,
-    capacities,
-    snapshots,
-    totalEstPulse,
-    plannedActualPulse,
-    velocity,
-  } = params;
-
+  const { sprint, totalEstPulse } = params;
   const chartData: ChartData[] = [];
 
-  // 総予定Pulse: 最初のスナップショット残量 + 完了分の見積（スプリント開始時点の規模）
-  let totalPulse: number;
-  if (snapshots && snapshots.length > 0) {
-    const sortedSnapshots = [...snapshots].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-    );
-    totalPulse =
-      sortedSnapshots[0].remainingPulse + plannedActualPulse;
-  } else {
-    totalPulse = totalEstPulse;
-  }
+  const tDate = params.today || new Date();
+  const todayStr = toDateKey(tDate);
 
-  const capacityMap: { [key: string]: number } = {};
-  capacities.forEach((c) => {
-    const dateStr = formatDate(c.date);
-    capacityMap[dateStr] = (capacityMap[dateStr] || 0) + c.pulseCount;
-  });
+  // 1. スプリントの総キャパシティを算出
+  const totalCapacity = sprint.days.reduce((sum, d) => sum + d.capacity, 0);
 
-  let totalCapacity = 0;
-  Object.values(capacityMap).forEach((v) => (totalCapacity += v));
+  let accumulatedCapacity = 0;
+  let prevActualRemaining = totalEstPulse;
 
-  const snapshotMap: { [key: string]: number } = {};
-  (snapshots || []).forEach((s) => {
-    const dateStr = formatDate(s.date);
-    snapshotMap[dateStr] = s.remainingPulse;
-  });
+  // days を日付順にソート
+  const sortedDays = [...sprint.days].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
-  let usedCapacity = 0;
-  let currentDate = new Date(sprint.startDate);
-  const endDateKey = toDateKey(sprint.endDate);
-  const todayStr = formatDate(new Date());
+  for (const day of sortedDays) {
+    const dayDateKey = toDateKey(day.date);
+    const dayLabel = formatDate(day.date);
 
-  let idealStarted = false;
-  let remainingWork = totalPulse;
+    // 累積キャパシティの加算
+    accumulatedCapacity += day.capacity;
 
-  while (toDateKey(currentDate) <= endDateKey) {
-    const dateStr = formatDate(currentDate);
-    const dayCapacity = capacityMap[dateStr] || 0;
-    const remainingCapacity = Math.max(0, totalCapacity - usedCapacity);
+    // 理想線 (Ideal)
+    const idealValue = totalCapacity > 0
+      ? Math.max(0, totalEstPulse * (1 - accumulatedCapacity / totalCapacity))
+      : totalEstPulse;
 
-    let idealValue: number | null = null;
-    if (!idealStarted && dateStr >= todayStr) {
-      idealStarted = true;
-      const latestSnapshot = [...(snapshots || [])].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      )[0];
-      remainingWork = latestSnapshot
-        ? latestSnapshot.remainingPulse
-        : totalPulse;
-      idealValue = remainingWork;
+    // 実績線 (Actual)
+    let actualValue: number | null = null;
+
+    if (dayDateKey <= todayStr) {
+      if (day.remaining !== null && day.remaining !== undefined) {
+        actualValue = day.remaining;
+        prevActualRemaining = day.remaining;
+      } else {
+        // 開かなかった日の補完: 直前の実績を引き継ぐ
+        actualValue = prevActualRemaining;
+      }
     }
-
-    if (idealStarted && dateStr > todayStr) {
-      const dailyDecrease = Math.min(dayCapacity, remainingWork);
-      remainingWork = Math.max(0, remainingWork - dailyDecrease);
-      idealValue = remainingWork;
-    }
-
-    const actual =
-      snapshotMap[dateStr] !== undefined ? snapshotMap[dateStr] : null;
 
     chartData.push({
-      date: dateStr,
+      date: dayLabel,
       ideal: idealValue,
-      actual: actual,
-      capacity: remainingCapacity,
-      velocity: dateStr <= todayStr ? velocity : null,
+      actual: actualValue,
+      capacity: Math.max(0, totalCapacity - accumulatedCapacity),
     });
-
-    usedCapacity += dayCapacity;
-    currentDate = addCalendarDays(currentDate, 1);
   }
 
   return chartData;
 }
+
+export interface RecurringChartDayData {
+  date: string;
+  dateKey: string;
+  [categoryId: string]: number | string;
+}
+
+export function generateRecurringChartData(
+  recurringTasks: RecurringTask[],
+  categories: Category[],
+  today: Date = new Date()
+): {
+  chartData: RecurringChartDayData[];
+  categories: { id: string; name: string; color: string }[];
+} {
+  const chartData: RecurringChartDayData[] = [];
+  
+  for (let i = 0; i < 14; i++) {
+    const targetDate = addCalendarDays(today, i);
+    const dateKey = toDateKey(targetDate);
+    const label = formatDate(targetDate);
+    
+    const dayOfWeek = (targetDate.getDay() === 0 ? 7 : targetDate.getDay()).toString();
+    const dayOfMonth = targetDate.getDate().toString();
+    
+    const dayData: RecurringChartDayData = {
+      date: label,
+      dateKey: dateKey,
+    };
+    
+    for (const cat of categories) {
+      dayData[cat.id] = 0;
+    }
+    
+    for (const task of recurringTasks) {
+      let matches = false;
+      if (task.pattern === "daily") {
+        matches = true;
+      } else if (task.pattern === "weekly") {
+        const days = task.patternValue.split(",");
+        if (days.includes(dayOfWeek)) {
+          matches = true;
+        }
+      } else if (task.pattern === "monthly") {
+        const days = task.patternValue.split(",");
+        if (days.includes(dayOfMonth)) {
+          matches = true;
+        }
+      }
+      
+      if (matches) {
+        dayData[task.categoryId] = (dayData[task.categoryId] as number) + 1;
+      }
+    }
+    
+    chartData.push(dayData);
+  }
+  
+  return {
+    chartData,
+    categories: categories.map(c => ({ id: c.id, name: c.name, color: c.color })),
+  };
+}
+
+

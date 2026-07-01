@@ -1,5 +1,12 @@
 export type SprintStatus = "planning" | "active" | "completed";
 
+export interface SprintDay {
+  date: Date;
+  capacity: number;
+  remaining: number | null;
+  note: string | null;
+}
+
 export class Sprint {
   constructor(
     public readonly id: string,
@@ -9,6 +16,7 @@ export class Sprint {
     public goal: string | null = null,
     public status: SprintStatus = "planning",
     public retrospective: string | null = null,
+    public days: SprintDay[] = [],
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
   ) {}
@@ -21,3 +29,4 @@ export class Sprint {
     return this.status === "completed";
   }
 }
+
