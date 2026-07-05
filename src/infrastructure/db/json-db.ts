@@ -94,6 +94,25 @@ export async function getDb() {
   // 開発・実行環境に合わせてファイルパスを調整
   const dbPath = process.env.DB_PATH || 'db.json';
   dbInstance = await JSONFilePreset<Data>(dbPath, defaultData);
+
+  // 読み込まれたデータが必要な構造を持っているか確認し、欠損しているキーがあれば補完する
+  let updated = false;
+  if (!dbInstance.data) {
+    dbInstance.data = { ...defaultData };
+    updated = true;
+  } else {
+    for (const key of Object.keys(defaultData) as Array<keyof Data>) {
+      if (!dbInstance.data[key]) {
+        dbInstance.data[key] = [] as any;
+        updated = true;
+      }
+    }
+  }
+
+  if (updated) {
+    await dbInstance.write();
+  }
+
   return dbInstance;
 }
 

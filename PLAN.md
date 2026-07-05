@@ -703,3 +703,22 @@ interface Task {
 - データロードを非同期で `Suspense` で囲むことで、ページ遷移の実行自体はミリ秒単位で一瞬で行われるようにする。
 
 - **ステータス**: ⏳ 保留（代替案としてメモ、様子見）
+
+---
+
+## 🚀 Docker起動時のDB初期化不具合の修正（2026-07-19）
+
+### 概要
+別マシンの Docker 環境で起動した際、マウントされた `db.json` が空（`{}` など）で存在している場合に、`db.data.backlogItems` などのプロパティが `undefined` となり、`findAll()` などの呼び出し時に `TypeError: Cannot read properties of undefined (reading 'map')` が発生してクラッシュする不具合を修正します。
+
+### 開発タスク
+
+1. **`json-db.ts` の修正 【完了】**
+   - `getDb` 関数において、`lowdb` の読み込み直後に `db.data` の各キー（`categories`, `recurringTasks`, `sprints`, `backlogItems`, `tasks`）が存在するか確認する。
+   - 欠損しているキーがあれば、`defaultData` から空配列を補完する。
+   - 補完を行った場合は `await db.write()` を呼び出し、補完されたスキーマをファイルに書き戻す。
+
+2. **動作確認 【完了】**
+   - ビルドが正常に通ることを確認する (`npm run build`)。
+
+- **ステータス**: 🎉 完了（2026-07-19）

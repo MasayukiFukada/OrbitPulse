@@ -130,7 +130,7 @@
         }
       ],
       "createdAt": "2026-05-08T13:11:00.000Z",
-      "updatedAt": "2026-07-05T14:52:18.193Z"
+      "updatedAt": "2026-07-19T12:44:07.886Z"
     }
   ],
   "backlogItems": [
@@ -563,54 +563,6 @@
       "priority": 0,
       "createdAt": "2026-07-05T14:30:15.642Z",
       "updatedAt": "2026-07-05T14:30:15.642Z"
-    },
-    {
-      "id": "ignite-active-Y3QBUG6_Khzis8tQVWMbX",
-      "sprintId": "Udy073spx42fxOX_hCbOi",
-      "backlogItemId": null,
-      "categoryId": "ignite-gacha",
-      "recurringTaskId": null,
-      "title": "深呼吸を3回する",
-      "status": "done",
-      "estimatedPulse": 0,
-      "actualPulse": 0,
-      "remainingPulse": 0,
-      "deadline": null,
-      "priority": 0,
-      "createdAt": "2026-07-05T14:47:44.662Z",
-      "updatedAt": "2026-07-05T14:52:18.169Z"
-    },
-    {
-      "id": "ignite-active-C-yIxuLjEihSkWq-ZGLKN",
-      "sprintId": "Udy073spx42fxOX_hCbOi",
-      "backlogItemId": null,
-      "categoryId": "ignite-gacha",
-      "recurringTaskId": null,
-      "title": "深呼吸を3回する",
-      "status": "done",
-      "estimatedPulse": 0,
-      "actualPulse": 0,
-      "remainingPulse": 0,
-      "deadline": null,
-      "priority": 0,
-      "createdAt": "2026-07-05T14:50:23.051Z",
-      "updatedAt": "2026-07-05T14:52:17.307Z"
-    },
-    {
-      "id": "ignite-active-TcYtWRdaQ2rqO4NggMdzN",
-      "sprintId": "Udy073spx42fxOX_hCbOi",
-      "backlogItemId": null,
-      "categoryId": "ignite-gacha",
-      "recurringTaskId": null,
-      "title": "深呼吸を3回する",
-      "status": "done",
-      "estimatedPulse": 0,
-      "actualPulse": 0,
-      "remainingPulse": 0,
-      "deadline": null,
-      "priority": 0,
-      "createdAt": "2026-07-05T14:52:02.566Z",
-      "updatedAt": "2026-07-05T14:52:16.587Z"
     }
   ]
 }
