@@ -81,7 +81,7 @@ type OldData = {
 };
 
 async function migrate() {
-  const dbPath = path.join(__dirname, '../db.json');
+  const dbPath = path.join(__dirname, '../data/db.json');
   console.log(`Starting migration for ${dbPath}...`);
 
   if (!fs.existsSync(dbPath)) {
@@ -296,7 +296,7 @@ async function migrate() {
   }
 
   // バックアップ作成と書き込み
-  const backupPath = path.join(__dirname, '../db.json.bak');
+  const backupPath = path.join(__dirname, '../data/db.json.bak');
   fs.writeFileSync(backupPath, oldRaw, 'utf-8');
   console.log(`Created raw JSON backup at ${backupPath}`);
 

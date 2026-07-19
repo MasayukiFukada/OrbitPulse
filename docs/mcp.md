@@ -53,5 +53,5 @@ npx @modelcontextprotocol/inspector npm --prefix /home/minamo/repository/OrbitPu
 
 ## 4. 考慮事項
 
-- `lowdb` を使用しているため、Next.js 実行時と MCP サーバー実行時で同じ `db.json` を参照します。
+- `lowdb` を使用しているため、Next.js 実行時と MCP サーバー実行時で同じ `data/db.json` を参照します。
 - データの整合性を保つため、ツール経由の操作も既存のユースケース（UseCase）を介して行われます。
