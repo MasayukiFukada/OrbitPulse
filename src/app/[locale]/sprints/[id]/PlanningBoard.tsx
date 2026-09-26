@@ -95,6 +95,7 @@ interface PlanningBoardProps {
     totalEstPulse: number;
     plannedActualPulse: number;
     totalActualPulse: number;
+    remainingPulse: number;
   };
   chartData: ChartData[];
 }
@@ -155,8 +156,8 @@ function PlanningBoardInner({
     capacityMap[formatDate(c.date)] = c.capacity;
   });
 
-  const { totalEstPulse, plannedActualPulse, totalActualPulse } = pulseStats;
-  const remainingEstPulse = totalEstPulse - plannedActualPulse;
+  const { totalEstPulse, plannedActualPulse, totalActualPulse, remainingPulse } = pulseStats;
+  const remainingEstPulse = remainingPulse;
 
   const todayKey = toDateKey(new Date());
   const endDateKey = toDateKey(sprint.endDate);
@@ -356,7 +357,7 @@ function PlanningBoardInner({
   const pooledPulse = pooledTasks.reduce((sum, t) => sum + t.remainingPulse, 0);
   const readyPulse = readyTasks.reduce((sum, t) => sum + t.remainingPulse, 0);
   const activePulse = activeTasks.reduce((sum, t) => sum + t.remainingPulse, 0);
-  const completedPulse = completedTasks.reduce((sum, t) => sum + t.remainingPulse, 0);
+  const completedPulse = completedTasks.reduce((sum, t) => sum + t.estimatedPulse, 0);
 
   // 数値メーターの共通レンダリング関数 (ホバーで増減ボタン、クリックで直接入力)
   const renderPulseIndicator = (

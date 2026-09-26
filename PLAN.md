@@ -722,3 +722,38 @@ interface Task {
    - ビルドが正常に通ることを確認する (`npm run build`)。
 
 - **ステータス**: 🎉 完了（2026-07-19）
+
+---
+
+## 🚀 スプリントのバーンダウンチャート描画およびPulse計算の不具合修正（2026-09-26）
+
+### 概要
+スプリント詳細画面において、Ready/Completedカラムへのタスク移動時に残りPulseや完了Pulseが正しく計算・反映されない問題、およびバーンダウンチャートのスナップショットが正常に更新されない問題を解消しました。
+
+### 原因
+1. **カンバンCompletedカラムの集計バグ**:
+   - `PlanningBoard.tsx` で `completedPulse` を `remainingPulse` の総和で計算していたため、完了時に残見積が0になる仕様上、常に「0 Pulse」と表示されていた。
+2. **ダッシュボード残り見積カードの `NaN` バグ**:
+   - `ManageSprintUseCase.getSprintPulseStats` の返却プロパティ名と `PlanningBoard.tsx` の型定義に食い違いがあり、未定義プロパティの減算で `NaN Pulse` が表示されていた。
+3. **バックログタスクのスプリントPulse集計漏れ**:
+   - `ManageSprintUseCase` 内のPulse集計で `taskRepository.findBySprintId(sprintId)` のみを対象にしていたため、スプリントに登録されたバックログアイテムの子タスク（`sprintId` 未セット時）が集計から除外されていた。
+4. **スナップショットの日付照合タイムゾーン不一致**:
+   - `takeSnapshot` や `fillMissingSnapshots` で UTC 基準の `toISOString()` を使用していたため、JST基準の `sprint.days` の日付キーとズレが生じていた。
+
+### 開発タスク
+
+1. **`ManageSprintUseCase.ts` の改修 【完了】**
+   - スプリントに紐づく全タスク（バックログアイテム配下＋単発ToDo）を確実に集計するヘルパー `getAllTasksInSprint` を追加。
+   - `calculateRemainingPulse`, `calculateInitialEstimate`, `getSprintPulseStats` で上記ヘルパーを使用し、`totalEstPulse`, `plannedActualPulse`（完了タスクの当初見積合計）, `totalActualPulse`, `remainingPulse`（残見積合計）を正確に計算。
+   - `addBacklogItemToSprint` / `removeBacklogItemFromSprint` 時に、配下のタスクの `sprintId` も整合性を保って更新。
+   - `takeSnapshot` および `fillMissingSnapshots` における日付キーの判定を `Asia/Tokyo` 基準に統一。
+
+2. **`PlanningBoard.tsx` の改修 【完了】**
+   - `pulseStats` の型定義をUseCaseと整合させ、`remainingEstPulse` に正確な `remainingPulse` を反映。
+   - カンバンの `completedPulse` を完了タスクの `estimatedPulse`（当初見積合計）で集計するように修正。
+
+3. **動作確認 【完了】**
+   - `npm run build` による型チェックおよびプロダクションビルドが成功することを確認。
+
+- **ステータス**: 🎉 完了（2026-09-26）
+

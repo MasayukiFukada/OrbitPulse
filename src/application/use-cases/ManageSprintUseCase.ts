@@ -148,6 +148,12 @@ export class ManageSprintUseCase {
 
     item.sprintId = sprintId;
     await this.backlogRepository.save(item);
+
+    const tasks = await this.taskRepository.findByBacklogItemId(backlogItemId);
+    for (const task of tasks) {
+      task.sprintId = sprintId;
+      await this.taskRepository.save(task);
+    }
   }
 
   async removeBacklogItemFromSprint(backlogItemId: string): Promise<void> {
@@ -156,11 +162,36 @@ export class ManageSprintUseCase {
 
     item.sprintId = null;
     await this.backlogRepository.save(item);
+
+    const tasks = await this.taskRepository.findByBacklogItemId(backlogItemId);
+    for (const task of tasks) {
+      task.sprintId = null;
+      await this.taskRepository.save(task);
+    }
   }
 
   async getItemsInSprint(sprintId: string) {
     const allItems = await this.backlogRepository.findAll();
     return allItems.filter((item) => item.sprintId === sprintId);
+  }
+
+  private async getAllTasksInSprint(sprintId: string) {
+    const items = await this.getItemsInSprint(sprintId);
+    const backlogTasksArrays = await Promise.all(
+      items.map((item) => this.taskRepository.findByBacklogItemId(item.id))
+    );
+    const backlogTasks = backlogTasksArrays.flat();
+    const sprintDirectTasks = await this.taskRepository.findBySprintId(sprintId);
+
+    const taskMap = new Map<string, typeof sprintDirectTasks[0]>();
+    for (const t of backlogTasks) {
+      taskMap.set(t.id, t);
+    }
+    for (const t of sprintDirectTasks) {
+      taskMap.set(t.id, t);
+    }
+
+    return Array.from(taskMap.values());
   }
 
   async calculateVelocity(sprintId: string): Promise<number> {
@@ -176,34 +207,48 @@ export class ManageSprintUseCase {
   }
 
   async calculateRemainingPulse(sprintId: string): Promise<number> {
-    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    const tasks = await this.getAllTasksInSprint(sprintId);
     return tasks.reduce((sum, task) => sum + (task.status !== "pooled" ? task.remainingPulse : 0), 0);
   }
 
   async calculateInitialEstimate(sprintId: string): Promise<number> {
-    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    const tasks = await this.getAllTasksInSprint(sprintId);
     return tasks.reduce((sum, task) => sum + (task.status !== "pooled" ? task.estimatedPulse : 0), 0);
   }
 
   async getSprintPulseStats(sprintId: string): Promise<{
     totalEstPulse: number;
-    remainingPulse: number;
+    plannedActualPulse: number;
     totalActualPulse: number;
+    remainingPulse: number;
   }> {
-    const tasks = await this.taskRepository.findBySprintId(sprintId);
+    const tasks = await this.getAllTasksInSprint(sprintId);
     let totalEstPulse = 0;
-    let remainingPulse = 0;
+    let plannedActualPulse = 0;
     let totalActualPulse = 0;
+    let remainingPulse = 0;
 
     for (const task of tasks) {
       if (task.status !== "pooled") {
         totalEstPulse += task.estimatedPulse;
         remainingPulse += task.remainingPulse;
         totalActualPulse += task.actualPulse;
+        if (task.status === "done") {
+          plannedActualPulse += task.estimatedPulse;
+        }
       }
     }
 
-    return { totalEstPulse, remainingPulse, totalActualPulse };
+    return { totalEstPulse, plannedActualPulse, totalActualPulse, remainingPulse };
+  }
+
+  private toDateKey(date: Date | string): string {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(date));
   }
 
   async takeSnapshot(sprintId: string, date?: Date): Promise<void> {
@@ -211,13 +256,13 @@ export class ManageSprintUseCase {
     if (!sprint) throw new Error("Sprint not found");
 
     const targetDate = date || new Date();
-    const dateStr = targetDate.toISOString().split("T")[0]; // YYYY-MM-DD
+    const dateStr = this.toDateKey(targetDate);
 
     const remainingPulse = await this.calculateRemainingPulse(sprintId);
 
     // sprint.days の中から一致する日を探して remaining を更新
     const day = sprint.days.find(d => {
-      const dDateStr = d.date instanceof Date ? d.date.toISOString().split("T")[0] : new Date(d.date).toISOString().split("T")[0];
+      const dDateStr = this.toDateKey(d.date);
       return dDateStr === dateStr;
     });
 
@@ -232,18 +277,19 @@ export class ManageSprintUseCase {
     if (!sprint) return;
 
     const totalEst = await this.calculateInitialEstimate(sprintId);
-
-    // 今日より前の日で remaining が null の日を補完
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayStr = this.toDateKey(new Date());
 
     let prevRemaining = totalEst;
 
-    for (const day of sprint.days) {
-      const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
-      dayDate.setHours(0, 0, 0, 0);
+    // days を日付順にソート
+    const sortedDays = [...sprint.days].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
 
-      if (dayDate < today) {
+    for (const day of sortedDays) {
+      const dayDateStr = this.toDateKey(day.date);
+
+      if (dayDateStr < todayStr) {
         if (day.remaining === null) {
           day.remaining = prevRemaining;
         } else {
